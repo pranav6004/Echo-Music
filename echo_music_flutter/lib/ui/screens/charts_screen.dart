@@ -174,27 +174,28 @@ class _ChartsScreenState extends State<ChartsScreen> {
 
         // Sections
         for (final sec in page.sections) ...[
-          if (sec.items.isEmpty) continue,
-          if (sec.items.first is SongItem) ...[
-            Padding(
-              padding: const EdgeInsets.only(top: 24, bottom: 12),
-              child: Text(
-                sec.title,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
+          if (sec.items.isNotEmpty) ...[
+            if (sec.items.first is SongItem) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 24, bottom: 12),
+                child: Text(
+                  sec.title,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-            ),
-            for (var i = 0; i < sec.items.length; i++) ...[
-              if (sec.items[i] is SongItem)
-                _buildChartItem(context, theme, scheme, sec.items[i] as SongItem, i + 1),
+              for (var i = 0; i < sec.items.length; i++) ...[
+                if (sec.items[i] is SongItem)
+                  _buildChartItem(context, theme, scheme, sec.items[i] as SongItem, i + 1),
+              ],
+            ] else ...[
+              const SizedBox(height: 16),
+              SectionCarousel(
+                title: sec.title,
+                items: sec.items,
+              ),
             ],
-          ] else ...[
-            const SizedBox(height: 16),
-            SectionCarousel(
-              title: sec.title,
-              items: sec.items,
-            ),
           ],
         ],
       ],
