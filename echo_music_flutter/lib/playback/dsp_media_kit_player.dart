@@ -8,7 +8,7 @@ import '../services/dsp_service.dart';
 
 class EchoMediaKitPlatform extends JustAudioPlatform {
   @override
-  AudioPlayerPlatform init(InitRequest request) => EchoMediaKitPlayer(request.id);
+  Future<AudioPlayerPlatform> init(InitRequest request) async => EchoMediaKitPlayer(request.id);
 
   @override
   Future<DisposePlayerResponse> disposePlayer(DisposePlayerRequest request) async {
