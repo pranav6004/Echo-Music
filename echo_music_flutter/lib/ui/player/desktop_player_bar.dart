@@ -116,14 +116,14 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                           const SizedBox(height: 2),
                           InkWell(
                             onTap: () {
-                              final aid = meta.artistId;
+                              final aid = meta.artists.isNotEmpty ? meta.artists.first.id : null;
                               if (aid != null && aid.isNotEmpty) {
                                 AppNavigator.openArtist(aid);
                               }
                             },
                             borderRadius: BorderRadius.circular(4),
                             child: Text(
-                              meta.artist,
+                              meta.artistsText,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.bodySmall?.copyWith(

@@ -207,7 +207,7 @@ class DesktopSidebar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       child: Row(
                         children: [
-                          if (isLoggedIn && settings.accountAvatarUrl != null)
+                          if (isLoggedIn && settings.accountAvatarUrl.isNotEmpty)
                             EchoImage(
                               url: settings.accountAvatarUrl,
                               width: 32,
@@ -236,7 +236,7 @@ class DesktopSidebar extends StatelessWidget {
                               children: [
                                 Text(
                                   isLoggedIn
-                                      ? (settings.accountName ?? 'Account')
+                                      ? (settings.accountName.isNotEmpty ? settings.accountName : 'Account')
                                       : 'Sign in',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -244,9 +244,9 @@ class DesktopSidebar extends StatelessWidget {
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                if (isLoggedIn && settings.accountHandle != null)
+                                if (isLoggedIn && settings.accountChannelHandle.isNotEmpty)
                                   Text(
-                                    settings.accountHandle!,
+                                    settings.accountChannelHandle,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: theme.textTheme.labelSmall?.copyWith(

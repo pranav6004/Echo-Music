@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'core/theme.dart';
 import 'data/settings.dart';
+import 'ui/screens/account_screen.dart';
 import 'ui/screens/login_screen.dart';
 import 'ui/shell/app_navigator.dart';
 import 'ui/shell/main_shell.dart';
