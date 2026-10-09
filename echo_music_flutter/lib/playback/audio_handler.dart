@@ -141,7 +141,7 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
         CanvasService.instance.updateCurrentTrack(
           title: meta.title,
           artist: meta.artistsText,
-          album: meta.album?.title,
+          album: meta.album?.name,
         );
         ListenTogetherService.instance.broadcastPlayback(
           metadata: meta,
