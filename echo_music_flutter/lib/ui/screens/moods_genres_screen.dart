@@ -5,6 +5,7 @@ import '../../innertube/pages/pages.dart';
 import '../../innertube/youtube.dart';
 import '../shell/app_navigator.dart';
 import 'browse_screen.dart';
+import '../../core/utils.dart';
 
 class MoodsAndGenresScreen extends StatefulWidget {
   const MoodsAndGenresScreen({super.key});
@@ -98,13 +99,7 @@ class _MoodsAndGenresScreenState extends State<MoodsAndGenresScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final crossAxisCount = width >= 1200
-            ? 4
-            : width >= 800
-                ? 3
-                : width >= 500
-                    ? 2
-                    : 1;
+        final crossAxisCount = responsiveGridColumns(width, minCols: 1, maxCols: 4);
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

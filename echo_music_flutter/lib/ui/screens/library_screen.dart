@@ -134,7 +134,7 @@ class _PlaylistsSliver extends StatelessWidget {
       builder: (context, data) {
         final playlists = data ?? const <PlaylistWithInfo>[];
         final screenW = MediaQuery.sizeOf(context).width;
-        final cols = screenW >= 1400 ? 6 : (screenW >= 1100 ? 5 : (screenW >= 800 ? 4 : (screenW >= 600 ? 3 : 2)));
+        final cols = responsiveGridColumns(screenW);
         final width = (screenW - (cols + 1) * 16) / cols;
         return SliverMainAxisGroup(
           slivers: [
@@ -472,7 +472,7 @@ class _AlbumsSliver extends StatelessWidget {
           );
         }
         final screenW = MediaQuery.sizeOf(context).width;
-        final cols = screenW >= 1400 ? 6 : (screenW >= 1100 ? 5 : (screenW >= 800 ? 4 : (screenW >= 600 ? 3 : 2)));
+        final cols = responsiveGridColumns(screenW);
         final width = (screenW - (cols + 1) * 16) / cols;
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),

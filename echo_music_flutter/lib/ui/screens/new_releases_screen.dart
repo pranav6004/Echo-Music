@@ -5,6 +5,7 @@ import '../../innertube/youtube.dart';
 import '../components/common.dart';
 import '../components/items.dart';
 import '../shell/app_navigator.dart';
+import '../../core/utils.dart';
 
 class NewReleasesScreen extends StatefulWidget {
   const NewReleasesScreen({super.key});
@@ -85,15 +86,7 @@ class _NewReleasesScreenState extends State<NewReleasesScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final crossAxisCount = width >= 1400
-            ? 6
-            : width >= 1100
-                ? 5
-                : width >= 850
-                    ? 4
-                    : width >= 600
-                        ? 3
-                        : 2;
+        final crossAxisCount = responsiveGridColumns(width);
 
         return GridView.builder(
           padding: const EdgeInsets.all(24),

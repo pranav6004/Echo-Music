@@ -95,3 +95,12 @@ String relativeDay(DateTime d) {
   ];
   return '${months[d.month - 1]} ${d.day}${d.year != now.year ? ', ${d.year}' : ''}';
 }
+
+/// Calculate responsive columns based on available container width
+int responsiveGridColumns(double width, {int minCols = 2, int maxCols = 6}) {
+  if (width >= 1400) return 6.clamp(minCols, maxCols);
+  if (width >= 1100) return 5.clamp(minCols, maxCols);
+  if (width >= 800) return 4.clamp(minCols, maxCols);
+  if (width >= 600) return 3.clamp(minCols, maxCols);
+  return minCols;
+}
