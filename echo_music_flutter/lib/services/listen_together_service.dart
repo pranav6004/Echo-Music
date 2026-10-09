@@ -339,7 +339,7 @@ class ListenTogetherService extends ChangeNotifier {
       id: metadata.id,
       title: metadata.title,
       artist: metadata.artistsText,
-      thumbnail: metadata.thumbnail,
+      thumbnail: metadata.thumbnailUrl,
       duration: metadata.duration,
     );
     _currentTrack = track;
