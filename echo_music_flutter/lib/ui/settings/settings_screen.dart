@@ -1,3 +1,4 @@
+import '../../services/dsp_service.dart';
 import '../screens/equalizer_screen.dart';
 import '../screens/listen_together_screen.dart';
 import 'ai_settings_screen.dart';
