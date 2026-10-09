@@ -176,47 +176,57 @@ class _PlaylistsSliver extends StatelessWidget {
             else
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverGrid.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: cols,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: width / (width + 48),
-                  ),
-                  itemCount: playlists.length,
-                  itemBuilder: (context, i) {
-                    final p = playlists[i];
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () =>
-                          AppNavigator.openLocalPlaylist(p.playlist.id),
-                      onLongPress: () => showLocalPlaylistMenu(context, p),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PlaylistMosaic(
-                            thumbnails: p.playlist.thumbnailUrl != null
-                                ? [p.playlist.thumbnailUrl!]
-                                : p.thumbnails,
-                            size: width,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            p.playlist.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            '${p.songCount} songs${p.playlist.browseId != null ? ' • YouTube' : ''}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
+                sliver: SliverLayoutBuilder(
+                  builder: (context, constraints) {
+                    final availableW = constraints.crossAxisExtent;
+                    final cols = responsiveGridColumns(availableW);
+                    final width = (availableW - (cols - 1) * 16) / cols;
+                    return SliverGrid.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: cols,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        childAspectRatio: width / (width + 68),
                       ),
+                      itemCount: playlists.length,
+                      itemBuilder: (context, i) {
+                        final p = playlists[i];
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () =>
+                              AppNavigator.openLocalPlaylist(p.playlist.id),
+                          onLongPress: () => showLocalPlaylistMenu(context, p),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              PlaylistMosaic(
+                                thumbnails: p.playlist.thumbnailUrl != null
+                                    ? [p.playlist.thumbnailUrl!]
+                                    : p.thumbnails,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                p.playlist.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${p.songCount} songs${p.playlist.browseId != null ? " • YouTube" : ""}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -231,46 +241,41 @@ class _PlaylistsSliver extends StatelessWidget {
 /// 2x2 mosaic of thumbnails (port of `PlaylistThumbnail`).
 class PlaylistMosaic extends StatelessWidget {
   final List<String> thumbnails;
-  final double size;
+  final double? size;
   final IconData? icon;
   const PlaylistMosaic({
     super.key,
     required this.thumbnails,
-    required this.size,
+    this.size,
     this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    Widget content;
     if (thumbnails.isEmpty) {
-      return Container(
-        width: size,
-        height: size,
+      content = Container(
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Icon(
-          icon ?? Icons.queue_music_rounded,
-          size: size * 0.4,
-          color: scheme.onSurfaceVariant,
+        child: Center(
+          child: Icon(
+            icon ?? Icons.queue_music_rounded,
+            size: (size ?? 120) * 0.4,
+            color: scheme.onSurfaceVariant,
+          ),
         ),
       );
-    }
-    if (thumbnails.length < 4) {
-      return EchoImage(
+    } else if (thumbnails.length < 4) {
+      content = EchoImage(
         url: thumbnails.first,
-        width: size,
-        height: size,
         radius: 16,
       );
-    }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
-        width: size,
-        height: size,
+    } else {
+      content = ClipRRect(
+        borderRadius: BorderRadius.circular(16),
         child: GridView.count(
           crossAxisCount: 2,
           physics: const NeverScrollableScrollPhysics(),
@@ -279,7 +284,19 @@ class PlaylistMosaic extends StatelessWidget {
               EchoImage(url: t, radius: 0, resize: 224),
           ],
         ),
-      ),
+      );
+    }
+
+    if (size != null) {
+      return SizedBox(
+        width: size,
+        height: size,
+        child: content,
+      );
+    }
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: content,
     );
   }
 }
@@ -471,20 +488,22 @@ class _AlbumsSliver extends StatelessWidget {
             ),
           );
         }
-        final screenW = MediaQuery.sizeOf(context).width;
-        final cols = responsiveGridColumns(screenW);
-        final width = (screenW - (cols + 1) * 16) / cols;
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          sliver: SliverGrid.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: cols,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: width / (width + 52),
-            ),
-            itemCount: albums.length,
-            itemBuilder: (context, i) {
+          sliver: SliverLayoutBuilder(
+            builder: (context, constraints) {
+              final availableW = constraints.crossAxisExtent;
+              final cols = responsiveGridColumns(availableW);
+              final width = (availableW - (cols - 1) * 16) / cols;
+              return SliverGrid.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: cols,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: width / (width + 68),
+                ),
+                itemCount: albums.length,
+                itemBuilder: (context, i) {
               final a = albums[i];
               return YTGridItem(
                 width: width,
@@ -500,6 +519,8 @@ class _AlbumsSliver extends StatelessWidget {
                   explicit: a.album.explicit,
                 ),
               );
+            },
+          );
             },
           ),
         );

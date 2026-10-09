@@ -234,8 +234,13 @@ class _Row extends StatelessWidget {
 
 class _SettingsPage extends StatelessWidget {
   final String title;
-  final List<Widget> groups;
-  const _SettingsPage({required this.title, required this.groups});
+  final List<Widget>? groups;
+  final List<Widget> Function(BuildContext context, Settings s)? builder;
+  const _SettingsPage({
+    required this.title,
+    this.groups,
+    this.builder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -243,29 +248,34 @@ class _SettingsPage extends StatelessWidget {
       appBar: AppBar(title: Text(title)),
       body: ListenableBuilder(
         listenable: Settings.instance,
-        builder: (context, _) => ListView(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            8,
-            16,
-            MediaQuery.paddingOf(context).bottom + 24,
-          ),
-          children: [
-            for (final g in groups) ...[g, const SizedBox(height: 12)],
-          ],
-        ),
+        builder: (context, _) {
+          final s = Settings.instance;
+          final list = builder != null ? builder!(context, s) : (groups ?? const <Widget>[]);
+          return ListView(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              8,
+              16,
+              MediaQuery.paddingOf(context).bottom + 24,
+            ),
+            children: [
+              for (final g in list) ...[g, const SizedBox(height: 12)],
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _Switch extends StatelessWidget {
+class _Switch extends StatefulWidget {
   final IconData icon;
   final String title;
   final String? subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
   const _Switch({
+    super.key,
     required this.icon,
     required this.title,
     this.subtitle,
@@ -274,13 +284,37 @@ class _Switch extends StatelessWidget {
   });
 
   @override
+  State<_Switch> createState() => _SwitchState();
+}
+
+class _SwitchState extends State<_Switch> {
+  late bool _val;
+
+  @override
+  void initState() {
+    super.initState();
+    _val = widget.value;
+  }
+
+  @override
+  void didUpdateWidget(covariant _Switch oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value) {
+      _val = widget.value;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SwitchListTile(
-      secondary: Icon(icon),
-      title: Text(title),
-      subtitle: subtitle != null ? Text(subtitle!) : null,
-      value: value,
-      onChanged: onChanged,
+      secondary: Icon(widget.icon),
+      title: Text(widget.title),
+      subtitle: widget.subtitle != null ? Text(widget.subtitle!) : null,
+      value: _val,
+      onChanged: (v) {
+        setState(() => _val = v);
+        widget.onChanged(v);
+      },
       shape: const RoundedRectangleBorder(),
     );
   }
@@ -355,7 +389,7 @@ class AppearanceSettings extends StatelessWidget {
     ];
     return _SettingsPage(
       title: 'Appearance',
-      groups: [
+      builder: (context, s) => [
         _Group(
           children: [
             _Row(
@@ -503,7 +537,7 @@ class PlayerSettings extends StatelessWidget {
     final s = Settings.instance;
     return _SettingsPage(
       title: 'Player & audio',
-      groups: [
+      builder: (context, s) => [
         _Group(
           children: [
             _Row(
@@ -677,7 +711,7 @@ class ContentSettings extends StatelessWidget {
     final s = Settings.instance;
     return _SettingsPage(
       title: 'Content',
-      groups: [
+      builder: (context, s) => [
         _Group(
           children: [
             _Switch(
@@ -795,7 +829,7 @@ class PrivacySettings extends StatelessWidget {
     final s = Settings.instance;
     return _SettingsPage(
       title: 'Privacy',
-      groups: [
+      builder: (context, s) => [
         _Group(
           children: [
             _Switch(
@@ -999,7 +1033,7 @@ class _StorageSettingsState extends State<StorageSettings> {
   Widget build(BuildContext context) {
     return _SettingsPage(
       title: 'Storage',
-      groups: [
+      builder: (context, s) => [
         _Group(
           children: [
             _Row(
@@ -1176,7 +1210,7 @@ class _IntegrationsSettingsState extends State<IntegrationsSettings> {
     final s = Settings.instance;
     return _SettingsPage(
       title: 'Integrations & Social',
-      groups: [
+      builder: (context, s) => [
         _Group(
           children: [
             _Switch(
