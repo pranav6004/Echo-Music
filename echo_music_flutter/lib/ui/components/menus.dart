@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/utils.dart';
 import '../../data/database.dart';
@@ -13,6 +13,18 @@ import '../shell/app_navigator.dart';
 import 'thumbnail.dart';
 
 /// Bottom-sheet context menus (port of `ui/menu/*Menu.kt`).
+
+Future<void> _copyLink(BuildContext context, String link) async {
+  await Clipboard.setData(ClipboardData(text: link));
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Link copied to clipboard'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
 
 class _MenuAction {
   final IconData icon;
@@ -248,9 +260,7 @@ Future<void> showSongMenu(
       _MenuAction(
         Icons.share_rounded,
         'Share',
-        () => SharePlus.instance.share(
-          ShareParams(uri: Uri.parse(song.shareLink)),
-        ),
+        () => _copyLink(context, song.shareLink),
       ),
   ];
   await _showMenu(
@@ -342,9 +352,7 @@ Future<void> showAlbumMenu(BuildContext context, AlbumItem album) async {
       _MenuAction(
         Icons.share_rounded,
         'Share',
-        () => SharePlus.instance.share(
-          ShareParams(uri: Uri.parse(album.shareLink)),
-        ),
+        () => _copyLink(context, album.shareLink),
       ),
     ],
   );
@@ -396,9 +404,7 @@ Future<void> showArtistMenu(BuildContext context, ArtistItem artist) async {
       _MenuAction(
         Icons.share_rounded,
         'Share',
-        () => SharePlus.instance.share(
-          ShareParams(uri: Uri.parse(artist.shareLink)),
-        ),
+        () => _copyLink(context, artist.shareLink),
       ),
       _MenuAction(
         Settings.instance.isArtistBlocked(artist.title)
@@ -509,9 +515,7 @@ Future<void> showPlaylistMenu(
       _MenuAction(
         Icons.share_rounded,
         'Share',
-        () => SharePlus.instance.share(
-          ShareParams(uri: Uri.parse(playlist.shareLink)),
-        ),
+        () => _copyLink(context, playlist.shareLink),
       ),
     ],
   );

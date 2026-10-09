@@ -234,18 +234,6 @@ class StreamResolver {
       lastReason = 'explode: $e';
     }
 
-    // Emergency Piped fallback.
-    try {
-      final stream = await _resolveWithPiped(videoId)
-          .timeout(const Duration(seconds: 12));
-      if (stream != null) {
-        _cache[videoId] = stream;
-        return stream;
-      }
-    } catch (e) {
-      lastReason = 'piped: $e';
-    }
-
     throw StreamResolveException(lastReason ?? 'No stream found');
   }
 
@@ -347,37 +335,5 @@ class StreamResolver {
     } finally {
       explode.close();
     }
-  }
-
-  Future<ResolvedStream?> _resolveWithPiped(String videoId) async {
-    final res = await _dio.get<dynamic>(
-      'https://pipedapi.kavin.rocks/streams/$videoId',
-      options: Options(responseType: ResponseType.json),
-    );
-    if (res.statusCode != 200) return null;
-    final streams = jml(res.data, ['audioStreams']);
-    JsonMap? best;
-    var bestBitrate = 0;
-    for (final s in streams) {
-      final url = js(s, ['url']);
-      final mime = js(s, ['mimeType']) ?? '';
-      if (url == null || url.isEmpty) continue;
-      if (_requireM4a && !mime.contains('mp4')) continue;
-      final br = ji(s, ['bitrate']) ?? 0;
-      if (br > bestBitrate) {
-        bestBitrate = br;
-        best = s;
-      }
-    }
-    if (best == null) return null;
-    return ResolvedStream(
-      videoId: videoId,
-      url: js(best, ['url'])!,
-      mimeType: js(best, ['mimeType']) ?? 'audio/mp4',
-      bitrate: bestBitrate,
-      clientName: 'piped',
-      headers: const {},
-      expiresAt: DateTime.now().add(const Duration(hours: 5)),
-    );
   }
 }

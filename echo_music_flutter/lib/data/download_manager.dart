@@ -98,10 +98,12 @@ class DownloadManager extends ChangeNotifier {
     _progress[m.id] = const DownloadProgress(DownloadState.downloading, 0);
     notifyListeners();
     try {
+      final safeId = m.id.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '');
+      if (safeId.isEmpty) throw StateError('Invalid track ID for download');
       final stream = await StreamResolver.instance.resolve(m.id);
       final ext = stream.mimeType.contains('webm') ? 'webm' : 'm4a';
       final dir = await _dir();
-      final path = p.join(dir.path, '${m.id}.$ext');
+      final path = p.join(dir.path, '$safeId.$ext');
       await _dio.download(
         stream.url,
         path,

@@ -65,7 +65,7 @@ class ScrobbleService {
     }
 
     if (s.enableListenBrainz && s.listenBrainzToken.isNotEmpty) {
-      _listenBrainzNowPlaying(metadata, s.listenBrainzToken);
+      _sendListenBrainz(metadata, s.listenBrainzToken, 'playing_now');
     }
   }
 
@@ -77,7 +77,7 @@ class ScrobbleService {
     }
 
     if (s.enableListenBrainz && s.listenBrainzToken.isNotEmpty) {
-      _listenBrainzScrobble(metadata, timestampSec, s.listenBrainzToken);
+      _sendListenBrainz(metadata, s.listenBrainzToken, 'single', timestampSec);
     }
   }
 
@@ -146,40 +146,14 @@ class ScrobbleService {
     sig += secret;
     return md5.convert(utf8.encode(sig)).toString();
   }
-
   // --- ListenBrainz API ---
 
-  Future<void> _listenBrainzNowPlaying(MediaMetadata m, String token) async {
-    try {
-      await _dio.post<dynamic>(
-        'https://api.listenbrainz.org/1/submit-listens',
-        options: Options(
-          headers: {
-            'Authorization': 'Token $token',
-            'Content-Type': 'application/json',
-          },
-        ),
-        data: {
-          'listen_type': 'playing_now',
-          'payload': [
-            {
-              'track_metadata': {
-                'artist_name': m.artistsText,
-                'track_name': m.title,
-                if (m.album?.name != null) 'release_name': m.album!.name,
-              },
-            },
-          ],
-        },
-      );
-    } catch (_) {}
-  }
-
-  Future<void> _listenBrainzScrobble(
+  Future<void> _sendListenBrainz(
     MediaMetadata m,
-    int timestampSec,
     String token,
-  ) async {
+    String type, [
+    int? timestampSec,
+  ]) async {
     try {
       await _dio.post<dynamic>(
         'https://api.listenbrainz.org/1/submit-listens',
@@ -190,10 +164,10 @@ class ScrobbleService {
           },
         ),
         data: {
-          'listen_type': 'single',
+          'listen_type': type,
           'payload': [
             {
-              'listened_at': timestampSec,
+              if (timestampSec != null) 'listened_at': timestampSec,
               'track_metadata': {
                 'artist_name': m.artistsText,
                 'track_name': m.title,

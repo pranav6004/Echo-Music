@@ -76,7 +76,74 @@ class AiService {
             ep = '$ep/v1/chat/completions';
           }
         }
+        final uri = Uri.tryParse(ep);
+        if (uri != null) {
+          final host = uri.host.toLowerCase();
+          if (host.startsWith('169.254.') || host == 'metadata.google.internal') {
+            throw ArgumentError('Custom AI endpoint pointing to cloud metadata service is prohibited');
+          }
+        }
         return ep;
+    }
+  }
+
+  Future<String> _postPrompt({
+    required String provider,
+    required String apiKey,
+    required String model,
+    required String endpoint,
+    required String userPrompt,
+    String? systemPrompt,
+    int maxTokens = 2000,
+    double temperature = 0.7,
+  }) async {
+    if (provider == 'anthropic') {
+      final res = await _dio.post<dynamic>(
+        endpoint,
+        options: Options(
+          headers: {
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json',
+          },
+        ),
+        data: {
+          'model': model,
+          'max_tokens': maxTokens,
+          if (systemPrompt != null) 'system': systemPrompt,
+          'messages': [
+            {'role': 'user', 'content': userPrompt}
+          ],
+        },
+      );
+      final contentList = res.data?['content'] as List<dynamic>?;
+      return contentList?.first?['text'] as String? ?? '';
+    } else {
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        if (apiKey.isNotEmpty) 'Authorization': 'Bearer $apiKey',
+        if (provider == 'openrouter') ...{
+          'HTTP-Referer': 'https://github.com/koiverse/Echo-Music',
+          'X-Title': 'Echo Music Desktop',
+        },
+      };
+
+      final res = await _dio.post<dynamic>(
+        endpoint,
+        options: Options(headers: headers),
+        data: {
+          'model': model,
+          'messages': [
+            if (systemPrompt != null) {'role': 'system', 'content': systemPrompt},
+            {'role': 'user', 'content': userPrompt},
+          ],
+          'max_tokens': maxTokens,
+          'temperature': temperature,
+        },
+      );
+
+      final choices = res.data?['choices'] as List<dynamic>?;
+      return choices?.first?['message']?['content'] as String? ?? '';
     }
   }
 
@@ -92,70 +159,20 @@ class AiService {
     final stopwatch = Stopwatch()..start();
 
     try {
-      if (provider == 'anthropic') {
-        final res = await _dio.post<dynamic>(
-          endpoint,
-          options: Options(
-            headers: {
-              'x-api-key': apiKey,
-              'anthropic-version': '2023-06-01',
-              'content-type': 'application/json',
-            },
-          ),
-          data: {
-            'model': model,
-            'max_tokens': 10,
-            'messages': [
-              {'role': 'user', 'content': 'ping'}
-            ],
-          },
-        );
-        stopwatch.stop();
-        if (res.statusCode == 200) {
-          return AiConnectionTestResult(
-            success: true,
-            message: 'Connected successfully to Anthropic ($model)',
-            latencyMs: stopwatch.elapsedMilliseconds,
-            model: model,
-          );
-        }
-      } else {
-        final headers = <String, String>{
-          'Content-Type': 'application/json',
-          if (apiKey.isNotEmpty) 'Authorization': 'Bearer $apiKey',
-          if (provider == 'openrouter') ...{
-            'HTTP-Referer': 'https://github.com/koiverse/Echo-Music',
-            'X-Title': 'Echo Music Desktop',
-          },
-        };
-
-        final res = await _dio.post<dynamic>(
-          endpoint,
-          options: Options(headers: headers),
-          data: {
-            'model': model,
-            'messages': [
-              {'role': 'user', 'content': 'ping'}
-            ],
-            'max_tokens': 10,
-          },
-        );
-        stopwatch.stop();
-
-        if (res.statusCode == 200) {
-          return AiConnectionTestResult(
-            success: true,
-            message: 'Connected successfully ($model)',
-            latencyMs: stopwatch.elapsedMilliseconds,
-            model: model,
-          );
-        }
-      }
-
+      await _postPrompt(
+        provider: provider,
+        apiKey: apiKey,
+        model: model,
+        endpoint: endpoint,
+        userPrompt: 'ping',
+        maxTokens: 10,
+      );
+      stopwatch.stop();
       return AiConnectionTestResult(
-        success: false,
-        message: 'Endpoint returned unexpected status',
+        success: true,
+        message: 'Connected successfully ($model)',
         latencyMs: stopwatch.elapsedMilliseconds,
+        model: model,
       );
     } catch (e) {
       stopwatch.stop();
@@ -195,73 +212,30 @@ Example: [{"title": "Midnight City", "artist": "M83"}]''';
 
     final userPrompt = 'Generate $count tracks for: "$prompt"';
 
-    String responseText = '';
-
-    if (provider == 'anthropic') {
-      final res = await _dio.post<dynamic>(
-        endpoint,
-        options: Options(
-          headers: {
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
-            'content-type': 'application/json',
-          },
-        ),
-        data: {
-          'model': model,
-          'max_tokens': 2000,
-          'system': systemPrompt,
-          'messages': [
-            {'role': 'user', 'content': userPrompt}
-          ],
-        },
-      );
-      final contentList = res.data?['content'] as List<dynamic>?;
-      if (contentList != null && contentList.isNotEmpty) {
-        responseText = contentList.first['text'] as String? ?? '';
-      }
-    } else {
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-        if (apiKey.isNotEmpty) 'Authorization': 'Bearer $apiKey',
-        if (provider == 'openrouter') ...{
-          'HTTP-Referer': 'https://github.com/koiverse/Echo-Music',
-          'X-Title': 'Echo Music Desktop',
-        },
-      };
-
-      final res = await _dio.post<dynamic>(
-        endpoint,
-        options: Options(headers: headers),
-        data: {
-          'model': model,
-          'messages': [
-            {'role': 'system', 'content': systemPrompt},
-            {'role': 'user', 'content': userPrompt},
-          ],
-          'temperature': 0.7,
-        },
-      );
-
-      final choices = res.data?['choices'] as List<dynamic>?;
-      if (choices != null && choices.isNotEmpty) {
-        responseText = choices.first?['message']?['content'] as String? ?? '';
-      }
-    }
-
-    // Clean JSON string
-    responseText = responseText.trim();
-    if (responseText.startsWith('```json')) {
-      responseText = responseText.substring(7);
-    } else if (responseText.startsWith('```')) {
-      responseText = responseText.substring(3);
-    }
-    if (responseText.endsWith('```')) {
-      responseText = responseText.substring(0, responseText.length - 3);
-    }
-    responseText = responseText.trim();
-
     try {
+      var responseText = await _postPrompt(
+        provider: provider,
+        apiKey: apiKey,
+        model: model,
+        endpoint: endpoint,
+        systemPrompt: systemPrompt,
+        userPrompt: userPrompt,
+        maxTokens: 2000,
+        temperature: 0.7,
+      );
+
+      // Clean JSON string
+      responseText = responseText.trim();
+      if (responseText.startsWith('```json')) {
+        responseText = responseText.substring(7);
+      } else if (responseText.startsWith('```')) {
+        responseText = responseText.substring(3);
+      }
+      if (responseText.endsWith('```')) {
+        responseText = responseText.substring(0, responseText.length - 3);
+      }
+      responseText = responseText.trim();
+
       final decoded = jsonDecode(responseText);
       if (decoded is List) {
         final list = <AiTrackSuggestion>[];
@@ -299,48 +273,20 @@ Maintain any LRC timestamps like [01:23.45] exactly as they are on the correspon
 Do NOT omit or add timestamps. Only translate the text.
 Do not add introductory or explanatory text. Return only the translated lyrics.''';
 
-    if (provider == 'anthropic') {
-      final res = await _dio.post<dynamic>(
-        endpoint,
-        options: Options(
-          headers: {
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
-            'content-type': 'application/json',
-          },
-        ),
-        data: {
-          'model': model,
-          'max_tokens': 3000,
-          'system': systemPrompt,
-          'messages': [
-            {'role': 'user', 'content': lyrics}
-          ],
-        },
+    try {
+      final translated = await _postPrompt(
+        provider: provider,
+        apiKey: apiKey,
+        model: model,
+        endpoint: endpoint,
+        systemPrompt: systemPrompt,
+        userPrompt: lyrics,
+        maxTokens: 3000,
+        temperature: 0.3,
       );
-      final contentList = res.data?['content'] as List<dynamic>?;
-      return contentList?.first?['text']?.toString() ?? lyrics;
-    } else {
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-        if (apiKey.isNotEmpty) 'Authorization': 'Bearer $apiKey',
-      };
-
-      final res = await _dio.post<dynamic>(
-        endpoint,
-        options: Options(headers: headers),
-        data: {
-          'model': model,
-          'messages': [
-            {'role': 'system', 'content': systemPrompt},
-            {'role': 'user', 'content': lyrics},
-          ],
-          'temperature': 0.3,
-        },
-      );
-
-      final choices = res.data?['choices'] as List<dynamic>?;
-      return choices?.first?['message']?['content']?.toString() ?? lyrics;
+      return translated.trim().isNotEmpty ? translated.trim() : lyrics;
+    } catch (_) {
+      return lyrics;
     }
   }
 }

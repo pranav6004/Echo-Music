@@ -241,53 +241,77 @@ class DiscordRpcService {
 
 /// Lightweight Win32 FFI wrapper for Windows Named Pipe I/O.
 class _Win32 {
-  static final k32 = Platform.isWindows
+  static final _k32 = Platform.isWindows
       ? ffi.DynamicLibrary.open('kernel32.dll')
       : null;
 
+  static final _createFile = _k32?.lookupFunction<
+    ffi.IntPtr Function(
+      ffi.Pointer<ffi.Uint16>,
+      ffi.Uint32,
+      ffi.Uint32,
+      ffi.Pointer<ffi.Void>,
+      ffi.Uint32,
+      ffi.Uint32,
+      ffi.IntPtr,
+    ),
+    int Function(
+      ffi.Pointer<ffi.Uint16>,
+      int,
+      int,
+      ffi.Pointer<ffi.Void>,
+      int,
+      int,
+      int,
+    )
+  >('CreateFileW');
+
+  static final _writeFile = _k32?.lookupFunction<
+    ffi.Int32 Function(
+      ffi.IntPtr,
+      ffi.Pointer<ffi.Uint8>,
+      ffi.Uint32,
+      ffi.Pointer<ffi.Uint32>,
+      ffi.Pointer<ffi.Void>,
+    ),
+    int Function(
+      int,
+      ffi.Pointer<ffi.Uint8>,
+      int,
+      ffi.Pointer<ffi.Uint32>,
+      ffi.Pointer<ffi.Void>,
+    )
+  >('WriteFile');
+
+  static final _closeHandle = _k32?.lookupFunction<
+    ffi.Int32 Function(ffi.IntPtr),
+    int Function(int)
+  >('CloseHandle');
+
+  static final _virtualAlloc = _k32?.lookupFunction<
+    ffi.Pointer<ffi.Void> Function(
+      ffi.Pointer<ffi.Void>,
+      ffi.Size,
+      ffi.Uint32,
+      ffi.Uint32,
+    ),
+    ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>, int, int, int)
+  >('VirtualAlloc');
+
+  static final _virtualFree = _k32?.lookupFunction<
+    ffi.Int32 Function(ffi.Pointer<ffi.Void>, ffi.Size, ffi.Uint32),
+    int Function(ffi.Pointer<ffi.Void>, int, int)
+  >('VirtualFree');
+
   static int openPipe(String name) {
-    final lib = k32;
-    if (lib == null) return -1;
-
-    final createFile = lib.lookupFunction<
-      ffi.IntPtr Function(
-        ffi.Pointer<ffi.Uint16>,
-        ffi.Uint32,
-        ffi.Uint32,
-        ffi.Pointer<ffi.Void>,
-        ffi.Uint32,
-        ffi.Uint32,
-        ffi.IntPtr,
-      ),
-      int Function(
-        ffi.Pointer<ffi.Uint16>,
-        int,
-        int,
-        ffi.Pointer<ffi.Void>,
-        int,
-        int,
-        int,
-      )
-    >('CreateFileW');
-
-    final virtualAlloc = lib.lookupFunction<
-      ffi.Pointer<ffi.Void> Function(
-        ffi.Pointer<ffi.Void>,
-        ffi.Size,
-        ffi.Uint32,
-        ffi.Uint32,
-      ),
-      ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>, int, int, int)
-    >('VirtualAlloc');
-
-    final virtualFree = lib.lookupFunction<
-      ffi.Int32 Function(ffi.Pointer<ffi.Void>, ffi.Size, ffi.Uint32),
-      int Function(ffi.Pointer<ffi.Void>, int, int)
-    >('VirtualFree');
+    final cf = _createFile;
+    final va = _virtualAlloc;
+    final vf = _virtualFree;
+    if (cf == null || va == null || vf == null) return -1;
 
     final units = name.codeUnits;
     final size = (units.length + 1) * 2;
-    final ptr = virtualAlloc(ffi.Pointer.fromAddress(0), size, 0x1000 | 0x2000, 0x04)
+    final ptr = va(ffi.Pointer.fromAddress(0), size, 0x1000 | 0x2000, 0x04)
         .cast<ffi.Uint16>();
     if (ptr.address == 0) return -1;
 
@@ -300,7 +324,7 @@ class _Win32 {
     const openExisting = 3;
     const fileAttributeNormal = 0x80;
 
-    final handle = createFile(
+    final handle = cf(
       ptr,
       genericReadWrite,
       0,
@@ -310,47 +334,17 @@ class _Win32 {
       0,
     );
 
-    virtualFree(ptr.cast<ffi.Void>(), 0, 0x8000);
+    vf(ptr.cast<ffi.Void>(), 0, 0x8000);
     return handle;
   }
 
   static bool writePipe(int handle, Uint8List data) {
-    final lib = k32;
-    if (lib == null) return false;
+    final wf = _writeFile;
+    final va = _virtualAlloc;
+    final vf = _virtualFree;
+    if (wf == null || va == null || vf == null) return false;
 
-    final writeFile = lib.lookupFunction<
-      ffi.Int32 Function(
-        ffi.IntPtr,
-        ffi.Pointer<ffi.Uint8>,
-        ffi.Uint32,
-        ffi.Pointer<ffi.Uint32>,
-        ffi.Pointer<ffi.Void>,
-      ),
-      int Function(
-        int,
-        ffi.Pointer<ffi.Uint8>,
-        int,
-        ffi.Pointer<ffi.Uint32>,
-        ffi.Pointer<ffi.Void>,
-      )
-    >('WriteFile');
-
-    final virtualAlloc = lib.lookupFunction<
-      ffi.Pointer<ffi.Void> Function(
-        ffi.Pointer<ffi.Void>,
-        ffi.Size,
-        ffi.Uint32,
-        ffi.Uint32,
-      ),
-      ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>, int, int, int)
-    >('VirtualAlloc');
-
-    final virtualFree = lib.lookupFunction<
-      ffi.Int32 Function(ffi.Pointer<ffi.Void>, ffi.Size, ffi.Uint32),
-      int Function(ffi.Pointer<ffi.Void>, int, int)
-    >('VirtualFree');
-
-    final ptr = virtualAlloc(
+    final ptr = va(
       ffi.Pointer.fromAddress(0),
       data.length + 8,
       0x1000 | 0x2000,
@@ -363,7 +357,7 @@ class _Win32 {
     }
 
     final bytesWrittenPtr = ptr.elementAt(data.length).cast<ffi.Uint32>();
-    final result = writeFile(
+    final result = wf(
       handle,
       ptr,
       data.length,
@@ -371,17 +365,11 @@ class _Win32 {
       ffi.Pointer.fromAddress(0),
     );
 
-    virtualFree(ptr.cast<ffi.Void>(), 0, 0x8000);
+    vf(ptr.cast<ffi.Void>(), 0, 0x8000);
     return result != 0;
   }
 
   static void closePipe(int handle) {
-    final lib = k32;
-    if (lib == null) return;
-    final closeHandle = lib.lookupFunction<
-      ffi.Int32 Function(ffi.IntPtr),
-      int Function(int)
-    >('CloseHandle');
-    closeHandle(handle);
+    _closeHandle?.call(handle);
   }
 }
