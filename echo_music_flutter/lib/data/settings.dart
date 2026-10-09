@@ -283,4 +283,26 @@ class Settings extends ChangeNotifier {
 
   bool get enableYouLyPlus => _prefs.getBool('enableYouLyPlus') ?? true;
   set enableYouLyPlus(bool v) => _set('enableYouLyPlus', v);
+
+  // Discord Rich Presence
+  bool get enableDiscordRpc => _prefs.getBool('enableDiscordRpc') ?? true;
+  set enableDiscordRpc(bool v) => _set('enableDiscordRpc', v);
+
+  // Last.fm Scrobbler
+  bool get enableLastFm => _prefs.getBool('enableLastFm') ?? false;
+  set enableLastFm(bool v) => _set('enableLastFm', v);
+  String get lastFmApiKey => _prefs.getString('lastFmApiKey') ?? '';
+  set lastFmApiKey(String v) => _set('lastFmApiKey', v);
+  String get lastFmApiSecret => _prefs.getString('lastFmApiSecret') ?? '';
+  set lastFmApiSecret(String v) => _set('lastFmApiSecret', v);
+  String get lastFmSessionKey => _prefs.getString('lastFmSessionKey') ?? '';
+  set lastFmSessionKey(String v) => _set('lastFmSessionKey', v);
+  String get lastFmUsername => _prefs.getString('lastFmUsername') ?? '';
+  set lastFmUsername(String v) => _set('lastFmUsername', v);
+
+  // ListenBrainz Scrobbler
+  bool get enableListenBrainz => _prefs.getBool('enableListenBrainz') ?? false;
+  set enableListenBrainz(bool v) => _set('enableListenBrainz', v);
+  String get listenBrainzToken => _prefs.getString('listenBrainzToken') ?? '';
+  set listenBrainzToken(String v) => _set('listenBrainzToken', v);
 }

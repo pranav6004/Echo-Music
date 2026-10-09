@@ -12,6 +12,7 @@ import '../screens/history_screen.dart';
 import '../screens/local_playlist_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/online_playlist_screen.dart';
+import '../screens/spotify_import_screen.dart';
 import '../screens/search_screen.dart';
 import '../settings/settings_screen.dart';
 
@@ -87,6 +88,8 @@ class AppNavigator {
   static void openCharts() => push(const ChartsScreen());
   static void openNewReleases() => push(const NewReleasesScreen());
   static void openMoodsAndGenres() => push(const MoodsAndGenresScreen());
+  static void openSpotifyImporter() => push(const SpotifyImportScreen());
+
   static void openHistory() => push(const HistoryScreen());
   static void openSearch({String? query}) =>
       push(SearchScreen(initialQuery: query));

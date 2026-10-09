@@ -169,6 +169,12 @@ class DesktopSidebar extends StatelessWidget {
                   label: 'Moods & Genres',
                   onTap: AppNavigator.openMoodsAndGenres,
                 ),
+                _SidebarShortcutTile(
+                  icon: Icons.sync_alt_rounded,
+                  iconColor: const Color(0xFF1DB954),
+                  label: 'Import Spotify',
+                  onTap: AppNavigator.openSpotifyImporter,
+                ),
               ],
             ),
           ),

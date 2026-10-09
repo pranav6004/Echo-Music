@@ -1,3 +1,4 @@
+import '../screens/spotify_import_screen.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
@@ -92,6 +93,16 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: 'Downloads and caches',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const StorageSettings()),
+                  ),
+                ),
+                _Row(
+                  icon: Icons.hub_rounded,
+                  title: 'Integrations & Social',
+                  subtitle: 'Discord RPC, Last.fm, Spotify',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const IntegrationsSettings(),
+                    ),
                   ),
                 ),
               ],
@@ -1078,6 +1089,200 @@ class AboutScreen extends StatelessWidget {
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class IntegrationsSettings extends StatefulWidget {
+  const IntegrationsSettings({super.key});
+
+  @override
+  State<IntegrationsSettings> createState() => _IntegrationsSettingsState();
+}
+
+class _IntegrationsSettingsState extends State<IntegrationsSettings> {
+  @override
+  Widget build(BuildContext context) {
+    final s = Settings.instance;
+    return _SettingsPage(
+      title: 'Integrations & Social',
+      groups: [
+        _Group(
+          title: 'DISCORD',
+          children: [
+            _Switch(
+              icon: Icons.games_rounded,
+              title: 'Discord Rich Presence',
+              subtitle:
+                  'Display song, artist, and album artwork on your Discord profile',
+              value: s.enableDiscordRpc,
+              onChanged: (v) {
+                setState(() => s.enableDiscordRpc = v);
+              },
+            ),
+          ],
+        ),
+        _Group(
+          title: 'SCROBBLING',
+          children: [
+            _Switch(
+              icon: Icons.radio_rounded,
+              title: 'Last.fm Scrobbler',
+              subtitle: s.lastFmSessionKey.isNotEmpty
+                  ? 'Connected as ${s.lastFmUsername.isNotEmpty ? s.lastFmUsername : "User"}'
+                  : 'Scrobble plays to Last.fm',
+              value: s.enableLastFm,
+              onChanged: (v) {
+                setState(() => s.enableLastFm = v);
+              },
+            ),
+            _Row(
+              icon: Icons.key_rounded,
+              title: 'Last.fm Credentials',
+              subtitle: s.lastFmSessionKey.isNotEmpty
+                  ? 'Tap to update credentials'
+                  : 'Configure API key & Session key',
+              onTap: _showLastFmDialog,
+            ),
+            _Switch(
+              icon: Icons.graphic_eq_rounded,
+              title: 'ListenBrainz Scrobbler',
+              subtitle: s.listenBrainzToken.isNotEmpty
+                  ? 'User token active'
+                  : 'Open-source scrobbling to MetaBrainz',
+              value: s.enableListenBrainz,
+              onChanged: (v) {
+                setState(() => s.enableListenBrainz = v);
+              },
+            ),
+            _Row(
+              icon: Icons.token_rounded,
+              title: 'ListenBrainz User Token',
+              subtitle: s.listenBrainzToken.isNotEmpty
+                  ? '••••••••••••'
+                  : 'Enter user token',
+              onTap: _showListenBrainzDialog,
+            ),
+          ],
+        ),
+        _Group(
+          title: 'PLAYLIST TOOLS',
+          children: [
+            _Row(
+              icon: Icons.sync_alt_rounded,
+              title: 'Import from Spotify',
+              subtitle: 'Mirror public Spotify playlists into your library',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const SpotifyImportScreen(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _showLastFmDialog() {
+    final s = Settings.instance;
+    final userCtrl = TextEditingController(text: s.lastFmUsername);
+    final keyCtrl = TextEditingController(text: s.lastFmApiKey);
+    final secretCtrl = TextEditingController(text: s.lastFmApiSecret);
+    final skCtrl = TextEditingController(text: s.lastFmSessionKey);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Last.fm Credentials'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: userCtrl,
+                decoration: const InputDecoration(labelText: 'Last.fm Username'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: keyCtrl,
+                decoration: const InputDecoration(labelText: 'API Key'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: secretCtrl,
+                decoration: const InputDecoration(labelText: 'API Secret'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: skCtrl,
+                decoration: const InputDecoration(labelText: 'Session Key (sk)'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              s.lastFmUsername = userCtrl.text.trim();
+              s.lastFmApiKey = keyCtrl.text.trim();
+              s.lastFmApiSecret = secretCtrl.text.trim();
+              s.lastFmSessionKey = skCtrl.text.trim();
+              Navigator.pop(ctx);
+              setState(() {});
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showListenBrainzDialog() {
+    final s = Settings.instance;
+    final tokenCtrl = TextEditingController(text: s.listenBrainzToken);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('ListenBrainz User Token'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Get your User Token from listenbrainz.org/profile to scrobble plays automatically.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: tokenCtrl,
+              decoration: const InputDecoration(
+                labelText: 'User Token',
+                hintText: 'Paste token here',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              s.listenBrainzToken = tokenCtrl.text.trim();
+              Navigator.pop(ctx);
+              setState(() {});
+            },
+            child: const Text('Save'),
           ),
         ],
       ),

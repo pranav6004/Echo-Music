@@ -14,6 +14,8 @@ import '../innertube/json_utils.dart';
 import '../innertube/youtube.dart';
 import '../innertube/youtube_client.dart';
 import '../stream/stream_resolver.dart';
+import '../services/discord_rpc_service.dart';
+import '../services/scrobble_service.dart';
 import 'media_metadata.dart';
 import 'queues.dart';
 
@@ -120,6 +122,45 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
       }
     });
     _player.positionStream.listen(_trackHistory);
+
+    // Social & Scrobbling listeners
+    DiscordRpcService.instance.init();
+
+    currentMetadata.addListener(() {
+      final meta = currentMetadata.value;
+      if (meta != null) {
+        DiscordRpcService.instance.updateFromMedia(
+          metadata: meta,
+          position: _player.position,
+          isPlaying: _player.playing,
+        );
+        ScrobbleService.instance.onTrackStarted(meta);
+      } else {
+        DiscordRpcService.instance.clearPresence();
+      }
+    });
+
+    _player.playingStream.listen((playing) {
+      final meta = currentMetadata.value;
+      if (meta != null) {
+        DiscordRpcService.instance.updateFromMedia(
+          metadata: meta,
+          position: _player.position,
+          isPlaying: playing,
+        );
+      }
+    });
+
+    _player.positionStream.listen((pos) {
+      final meta = currentMetadata.value;
+      if (meta != null) {
+        ScrobbleService.instance.onPositionUpdate(
+          meta,
+          pos,
+          effectiveDuration.value ?? Duration(seconds: meta.duration),
+        );
+      }
+    });
     _player.durationStream.listen((d) {
       _refreshEffectiveDuration();
       final meta = currentMetadata.value;
