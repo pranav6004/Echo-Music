@@ -100,27 +100,32 @@ class DspService extends ChangeNotifier {
 
     final filters = <String>[];
 
-    // 1. Preamp & Equalizer
+    // 1. Preamp & Equalizer (10 ISO Bands biquad peaking)
     if (s.enableEqualizer) {
       if (s.equalizerPreamp != 0.0) {
         final p = s.equalizerPreamp > 0
             ? '+${s.equalizerPreamp.toStringAsFixed(1)}'
             : s.equalizerPreamp.toStringAsFixed(1);
-        filters.add('volume=volume=${p}dB');
+        filters.add('lavfi=[volume=volume=${p}dB]');
       }
+      const freqs = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
       final bands = s.equalizerBands;
-      final gains = bands.map((b) => b.toStringAsFixed(1)).join(':');
-      filters.add('equalizer=$gains');
+      for (var i = 0; i < 10 && i < bands.length; i++) {
+        final gain = bands[i];
+        if (gain.abs() > 0.05) {
+          filters.add('lavfi=[equalizer=f=${freqs[i]}:width_type=o:width=1.0:g=${gain.toStringAsFixed(1)}]');
+        }
+      }
     }
 
-    // 2. Bass Boost
+    // 2. Bass Boost (lowshelf filter)
     if (s.enableBassBoost && s.bassBoostGain > 0) {
-      filters.add('bass=g=${s.bassBoostGain.toStringAsFixed(1)}:f=100');
+      filters.add('lavfi=[bass=g=${s.bassBoostGain.toStringAsFixed(1)}:f=100]');
     }
 
-    // 3. Spatial Audio / Stereo Widener (Mid-Side Widening)
+    // 3. Spatial Audio / Stereo Widener (Mid-Side widening via stereotools)
     if (s.enableSpatialAudio && s.spatialAudioWidth > 1.0) {
-      filters.add('extrastereo=m=${s.spatialAudioWidth.toStringAsFixed(2)}');
+      filters.add('lavfi=[stereotools=slev=${s.spatialAudioWidth.toStringAsFixed(2)}]');
     }
 
     final afString = filters.join(',');
@@ -130,7 +135,27 @@ class DspService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('DSP filter error: $e');
+      if (player.platform is NativePlayer) {
+        try {
+          await (player.platform as NativePlayer).setProperty('af', '');
+        } catch (_) {}
+      }
     }
+  }
+
+  Future<void> setWasapiExclusive(bool enabled) async {
+    final s = Settings.instance;
+    s.wasapiExclusive = enabled;
+    if (_player?.platform is NativePlayer && Platform.isWindows) {
+      final np = _player!.platform as NativePlayer;
+      try {
+        await np.setProperty('ao', 'wasapi');
+        await np.setProperty('audio-exclusive', enabled ? 'yes' : 'no');
+      } catch (e) {
+        debugPrint('WASAPI exclusive toggle failed: $e');
+      }
+    }
+    notifyListeners();
   }
 
   Future<void> setEqualizerEnabled(bool enabled) async {

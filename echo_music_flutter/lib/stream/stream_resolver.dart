@@ -1,3 +1,4 @@
+import 'lossless_resolver.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -39,7 +40,7 @@ class ResolvedStream {
       DateTime.now().isAfter(expiresAt.subtract(const Duration(minutes: 10)));
 }
 
-enum AudioQualityPref { auto, high, low }
+enum AudioQualityPref { auto, high, low, lossless }
 
 class StreamResolveException implements Exception {
   final String message;
@@ -90,7 +91,12 @@ class StreamResolver {
 
   bool get _requireM4a => Platform.isIOS || Platform.isMacOS;
 
-  Future<ResolvedStream> resolve(String videoId, {bool forceRefresh = false}) {
+  Future<ResolvedStream> resolve(
+    String videoId, {
+    bool forceRefresh = false,
+    String? title,
+    String? artist,
+  }) {
     final cached = _cache[videoId];
     if (!forceRefresh && cached != null && !cached.isExpired) {
       return Future.value(cached);
@@ -99,7 +105,7 @@ class StreamResolver {
     if (existing != null) return existing;
     // Block body on purpose: Map.remove returns the removed future and an
     // expression body would make whenComplete wait on that future (itself).
-    final future = _resolve(videoId).whenComplete(() {
+    final future = _resolve(videoId, title: title, artist: artist).whenComplete(() {
       _inFlight.remove(videoId);
     });
     _inFlight[videoId] = future;
@@ -111,6 +117,7 @@ class StreamResolver {
   void clearCache() {
     _cache.clear();
     _excluded.clear();
+    LosslessResolver.instance.clearCache();
   }
 
   /// Record that googlevideo refused [url] mid-playback so the minting client
@@ -132,7 +139,23 @@ class StreamResolver {
     return map.keys.toSet();
   }
 
-  Future<ResolvedStream> _resolve(String videoId) async {
+  Future<ResolvedStream> _resolve(
+    String videoId, {
+    String? title,
+    String? artist,
+  }) async {
+    if (quality == AudioQualityPref.lossless && title != null && title.isNotEmpty) {
+      final lossless = await LosslessResolver.instance.resolve(
+        videoId: videoId,
+        title: title,
+        artist: artist,
+      );
+      if (lossless != null) {
+        _cache[videoId] = lossless;
+        return lossless;
+      }
+    }
+
     final yt0 = YouTube.instance;
     if (yt0.visitorData == null) {
       try {
@@ -260,6 +283,7 @@ class StreamResolver {
       case AudioQualityPref.low:
         return audio.last;
       case AudioQualityPref.high:
+      case AudioQualityPref.lossless:
       case AudioQualityPref.auto:
         return audio.first;
     }

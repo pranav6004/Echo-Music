@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum DarkModePref { auto, on, off }
 
-enum AudioQualityPrefSetting { auto, high, low }
+enum AudioQualityPrefSetting { auto, high, low, lossless }
 
 enum PlayerBackgroundStyle { gradient, blur, plain }
 
@@ -145,6 +145,9 @@ class Settings extends ChangeNotifier {
 
   bool get audioNormalization => _prefs.getBool('audioNormalization') ?? true;
   set audioNormalization(bool v) => _set('audioNormalization', v);
+
+  bool get wasapiExclusive => _prefs.getBool('wasapiExclusive') ?? false;
+  set wasapiExclusive(bool v) => _set('wasapiExclusive', v);
 
   bool get savedShuffle => _prefs.getBool('shuffleMode') ?? false;
   set savedShuffle(bool v) => _set('shuffleMode', v);

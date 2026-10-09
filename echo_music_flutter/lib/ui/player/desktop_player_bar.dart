@@ -1,3 +1,4 @@
+import '../../stream/stream_resolver.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
@@ -136,6 +137,40 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                     ),
                     const SizedBox(width: 8),
                     _LikeButton(meta: meta),
+                    const SizedBox(width: 6),
+                    ValueListenableBuilder<ResolvedStream?>(
+                      valueListenable: handler.currentStream,
+                      builder: (context, stream, _) {
+                        if (stream == null) return const SizedBox.shrink();
+                        final isLossless = stream.mimeType.contains('flac');
+                        final isOpus = stream.mimeType.contains('opus') || stream.mimeType.contains('webm');
+                        final label = isLossless ? 'FLAC' : (isOpus ? 'OPUS' : 'AAC');
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isLossless
+                                ? scheme.primary.withValues(alpha: 0.15)
+                                : scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: isLossless
+                                  ? scheme.primary.withValues(alpha: 0.4)
+                                  : scheme.outlineVariant.withValues(alpha: 0.3),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Text(
+                            label,
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                              color: isLossless ? scheme.primary : scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

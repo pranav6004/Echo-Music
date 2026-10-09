@@ -653,7 +653,7 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
           currentStream.value = null;
         } else {
           debugPrint('[player] resolving ${meta.id}');
-          final stream = await StreamResolver.instance.resolve(meta.id);
+          final stream = await StreamResolver.instance.resolve(meta.id, title: meta.title, artist: meta.artistsText);
           debugPrint('[player] resolved ${meta.id} -> ${stream.clientName}');
           if (gen != _loadGeneration) {
             debugPrint(
@@ -754,7 +754,7 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
     if (next.isLocal) return;
     unawaited(
       StreamResolver.instance
-          .resolve(next.id)
+          .resolve(next.id, title: next.title, artist: next.artistsText)
           .catchError((Object e) {
             debugPrint('pre-resolve failed: $e');
             return Future<ResolvedStream>.error(e);

@@ -500,12 +500,14 @@ class PlayerSettings extends StatelessWidget {
                 AudioQualityPrefSetting.auto => 'Auto',
                 AudioQualityPrefSetting.high => 'High',
                 AudioQualityPrefSetting.low => 'Low (data saver)',
+                AudioQualityPrefSetting.lossless => 'Lossless (FLAC 1411 kbps)',
               },
               onTap: () async {
                 final v = await _pick(context, 'Audio quality', const [
                   (AudioQualityPrefSetting.auto, 'Auto'),
-                  (AudioQualityPrefSetting.high, 'High'),
+                  (AudioQualityPrefSetting.high, 'High (Opus 160k / AAC 256k)'),
                   (AudioQualityPrefSetting.low, 'Low (data saver)'),
+                  (AudioQualityPrefSetting.lossless, 'Lossless (FLAC 1411 kbps where available)'),
                 ], s.audioQuality);
                 if (v != null) {
                   s.audioQuality = v;
@@ -513,11 +515,20 @@ class PlayerSettings extends StatelessWidget {
                     AudioQualityPrefSetting.auto => AudioQualityPref.auto,
                     AudioQualityPrefSetting.high => AudioQualityPref.high,
                     AudioQualityPrefSetting.low => AudioQualityPref.low,
+                    AudioQualityPrefSetting.lossless => AudioQualityPref.lossless,
                   };
                   StreamResolver.instance.clearCache();
                 }
               },
             ),
+            if (Platform.isWindows)
+              _Switch(
+                icon: Icons.speaker_group_rounded,
+                title: 'WASAPI Exclusive Mode',
+                subtitle: 'Bit-perfect direct hardware output to DAC (bypasses Windows mixer)',
+                value: s.wasapiExclusive,
+                onChanged: (v) => DspService.instance.setWasapiExclusive(v),
+              ),
             _Switch(
               icon: Icons.volume_up_outlined,
               title: 'Audio normalization',

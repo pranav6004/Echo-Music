@@ -70,6 +70,14 @@ class EchoMediaKitPlayer extends AudioPlayerPlatform {
       }
     }
 
+    if (Platform.isWindows && _player.platform is NativePlayer) {
+      final np = _player.platform as NativePlayer;
+      if (Settings.instance.wasapiExclusive) {
+        np.setProperty('ao', 'wasapi');
+        np.setProperty('audio-exclusive', 'yes');
+      }
+    }
+
     _streamSubscriptions = [
       _player.stream.duration.listen((duration) {
         if (_currentMedia?.extras?['overrideDuration'] != null) return;
