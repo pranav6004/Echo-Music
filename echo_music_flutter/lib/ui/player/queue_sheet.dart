@@ -17,13 +17,13 @@ Future<void> showQueueSheet(BuildContext context) {
       minChildSize: 0.4,
       maxChildSize: 0.95,
       expand: false,
-      builder: (ctx, controller) => const _QueueBody(),
+      builder: (ctx, controller) => const QueueBody(),
     ),
   );
 }
 
-class _QueueBody extends StatelessWidget {
-  const _QueueBody();
+class QueueBody extends StatelessWidget {
+  const QueueBody();
 
   @override
   Widget build(BuildContext context) {
@@ -144,3 +144,4 @@ class _QueueBody extends StatelessWidget {
     );
   }
 }
+

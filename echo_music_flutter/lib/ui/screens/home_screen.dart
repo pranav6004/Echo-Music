@@ -366,13 +366,15 @@ class _LocalSongColumns extends StatelessWidget {
     for (var i = 0; i < songs.length; i += rows) {
       pages.add(songs.sublist(i, (i + rows).clamp(0, songs.length)));
     }
-    final width = MediaQuery.sizeOf(context).width - 40;
+    final screenW = MediaQuery.sizeOf(context).width;
+    final width = screenW >= 800 ? 360.0 : (screenW - 40).clamp(280.0, 420.0);
+    final isDesktop = screenW >= 800;
     return SizedBox(
       height: rows * 64.0,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),
-        physics: const PageScrollPhysics(),
+        physics: isDesktop ? const BouncingScrollPhysics() : const PageScrollPhysics(),
         itemCount: pages.length,
         itemBuilder: (context, p) => SizedBox(
           width: width,

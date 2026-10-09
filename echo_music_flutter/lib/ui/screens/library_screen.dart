@@ -79,7 +79,7 @@ class _LibraryScreenState extends State<LibraryScreen>
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             sliver: SliverGrid.count(
-              crossAxisCount: 2,
+              crossAxisCount: MediaQuery.sizeOf(context).width >= 800 ? 4 : 2,
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
               childAspectRatio: 2.9,
@@ -133,7 +133,9 @@ class _PlaylistsSliver extends StatelessWidget {
       query: db.playlists,
       builder: (context, data) {
         final playlists = data ?? const <PlaylistWithInfo>[];
-        final width = (MediaQuery.sizeOf(context).width - 48) / 2;
+        final screenW = MediaQuery.sizeOf(context).width;
+        final cols = screenW >= 1400 ? 6 : (screenW >= 1100 ? 5 : (screenW >= 800 ? 4 : (screenW >= 600 ? 3 : 2)));
+        final width = (screenW - (cols + 1) * 16) / cols;
         return SliverMainAxisGroup(
           slivers: [
             SliverToBoxAdapter(
@@ -176,7 +178,7 @@ class _PlaylistsSliver extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverGrid.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                    crossAxisCount: cols,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
                     childAspectRatio: width / (width + 48),
@@ -469,12 +471,14 @@ class _AlbumsSliver extends StatelessWidget {
             ),
           );
         }
-        final width = (MediaQuery.sizeOf(context).width - 48) / 2;
+        final screenW = MediaQuery.sizeOf(context).width;
+        final cols = screenW >= 1400 ? 6 : (screenW >= 1100 ? 5 : (screenW >= 800 ? 4 : (screenW >= 600 ? 3 : 2)));
+        final width = (screenW - (cols + 1) * 16) / cols;
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
           sliver: SliverGrid.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: cols,
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
               childAspectRatio: width / (width + 52),

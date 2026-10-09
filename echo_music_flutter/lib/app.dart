@@ -1,12 +1,25 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'core/theme.dart';
 import 'data/settings.dart';
-import 'ui/screens/account_screen.dart';
 import 'ui/screens/login_screen.dart';
 import 'ui/shell/app_navigator.dart';
 import 'ui/shell/main_shell.dart';
+
+class EchoScrollBehavior extends MaterialScrollBehavior {
+  const EchoScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+      };
+}
 
 class EchoApp extends StatefulWidget {
   const EchoApp({super.key});
@@ -36,6 +49,7 @@ class _EchoAppState extends State<EchoApp> {
         return MaterialApp(
           title: 'Echo Music',
           debugShowCheckedModeBanner: false,
+          scrollBehavior: const EchoScrollBehavior(),
           navigatorKey: AppNavigator.rootKey,
           theme: EchoTheme.build(
             brightness: Brightness.light,

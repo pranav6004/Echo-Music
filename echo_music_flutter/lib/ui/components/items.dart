@@ -352,7 +352,7 @@ class LocalSongTile extends StatelessWidget {
 }
 
 /// Grid card (square art, title, subtitle) for carousels.
-class YTGridItem extends StatelessWidget {
+class YTGridItem extends StatefulWidget {
   final YTItem item;
   final double width;
   final VoidCallback? onTap;
@@ -367,9 +367,16 @@ class YTGridItem extends StatelessWidget {
   });
 
   @override
+  State<YTGridItem> createState() => _YTGridItemState();
+}
+
+class _YTGridItemState extends State<YTGridItem> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final it = item;
+    final it = widget.item;
     final circle = it is ArtistItem;
     String subtitle;
     VoidCallback tap;
@@ -381,7 +388,7 @@ class YTGridItem extends StatelessWidget {
     } else if (it is AlbumItem) {
       subtitle = joinByBullet([
         it.artistsText.isNotEmpty ? it.artistsText : 'Album',
-        if (it.year != null) '${it.year}',
+        if (it.year != null) '',
       ]);
       tap = () => AppNavigator.openAlbum(it.browseId, album: it);
       more = () => showAlbumMenu(context, it);
@@ -399,18 +406,43 @@ class YTGridItem extends StatelessWidget {
     } else {
       return const SizedBox.shrink();
     }
-    final sub = subtitleOverride ?? subtitle;
+    final sub = widget.subtitleOverride ?? subtitle;
     final image = EchoImage(
       url: it.thumbnail,
-      width: width,
-      height: width,
+      width: widget.width,
+      height: widget.width,
       radius: 16,
       circle: circle,
     );
-    Widget art = image;
+    Widget art = Stack(
+      children: [
+        image,
+        if (_hovered && !circle)
+          Positioned(
+            right: 8,
+            bottom: 8,
+            child: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+              ),
+            ),
+          ),
+      ],
+    );
     if (it is SongItem) {
-      // Note: reference `image`, not `art` — closures capture variables, and
-      // `art` is reassigned to this very widget (infinite recursion otherwise).
       art = NowPlayingAware(
         id: it.id,
         builder: (context, active, playing) => Stack(
@@ -432,44 +464,72 @@ class YTGridItem extends StatelessWidget {
                     ),
                   ),
                 ),
+              )
+            else if (_hovered)
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+                  ),
+                ),
               ),
           ],
         ),
       );
     }
-    return SizedBox(
-      width: width,
-      child: InkWell(
-        onTap: onTap ?? tap,
-        onLongPress: more,
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          crossAxisAlignment: circle
-              ? CrossAxisAlignment.center
-              : CrossAxisAlignment.start,
-          children: [
-            art,
-            const SizedBox(height: 8),
-            Text(
-              it.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: circle ? TextAlign.center : TextAlign.start,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (sub.isNotEmpty)
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: SizedBox(
+        width: widget.width,
+        child: InkWell(
+          onTap: widget.onTap ?? tap,
+          onLongPress: more,
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            crossAxisAlignment: circle
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
+            children: [
+              art,
+              const SizedBox(height: 8),
               Text(
-                sub,
+                it.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: circle ? TextAlign.center : TextAlign.start,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-          ],
+              if (sub.isNotEmpty)
+                Text(
+                  sub,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: circle ? TextAlign.center : TextAlign.start,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -542,14 +602,16 @@ class SongColumnsPager extends StatelessWidget {
     for (var i = 0; i < songs.length; i += rows) {
       pages.add(songs.sublist(i, (i + rows).clamp(0, songs.length)));
     }
-    final width = MediaQuery.sizeOf(context).width - 40;
+    final screenW = MediaQuery.sizeOf(context).width;
+    final width = screenW >= 800 ? 360.0 : (screenW - 40).clamp(280.0, 420.0);
+    final isDesktop = screenW >= 800;
     return SizedBox(
       height: rows * 64.0,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         itemCount: pages.length,
-        physics: const PageScrollPhysics(),
+        physics: isDesktop ? const BouncingScrollPhysics() : const PageScrollPhysics(),
         itemBuilder: (context, p) => SizedBox(
           width: width,
           child: Column(
