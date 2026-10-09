@@ -241,11 +241,11 @@ class DiscordRpcService {
 
 /// Lightweight Win32 FFI wrapper for Windows Named Pipe I/O.
 class _Win32 {
-  static final _k32 = Platform.isWindows
+  static final k32 = Platform.isWindows
       ? ffi.DynamicLibrary.open('kernel32.dll')
       : null;
 
-  static final _createFile = _k32?.lookupFunction<
+  static final _createFile = k32?.lookupFunction<
     ffi.IntPtr Function(
       ffi.Pointer<ffi.Uint16>,
       ffi.Uint32,
@@ -266,7 +266,7 @@ class _Win32 {
     )
   >('CreateFileW');
 
-  static final _writeFile = _k32?.lookupFunction<
+  static final _writeFile = k32?.lookupFunction<
     ffi.Int32 Function(
       ffi.IntPtr,
       ffi.Pointer<ffi.Uint8>,
@@ -283,12 +283,12 @@ class _Win32 {
     )
   >('WriteFile');
 
-  static final _closeHandle = _k32?.lookupFunction<
+  static final _closeHandle = k32?.lookupFunction<
     ffi.Int32 Function(ffi.IntPtr),
     int Function(int)
   >('CloseHandle');
 
-  static final _virtualAlloc = _k32?.lookupFunction<
+  static final _virtualAlloc = k32?.lookupFunction<
     ffi.Pointer<ffi.Void> Function(
       ffi.Pointer<ffi.Void>,
       ffi.Size,
@@ -298,7 +298,7 @@ class _Win32 {
     ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>, int, int, int)
   >('VirtualAlloc');
 
-  static final _virtualFree = _k32?.lookupFunction<
+  static final _virtualFree = k32?.lookupFunction<
     ffi.Int32 Function(ffi.Pointer<ffi.Void>, ffi.Size, ffi.Uint32),
     int Function(ffi.Pointer<ffi.Void>, int, int)
   >('VirtualFree');
