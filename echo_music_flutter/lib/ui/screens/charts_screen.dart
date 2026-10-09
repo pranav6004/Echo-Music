@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/utils.dart';
 import '../../innertube/models/yt_item.dart';
 import '../../innertube/pages/pages.dart';
 import '../../innertube/youtube.dart';
@@ -54,17 +55,16 @@ class _ChartsScreenState extends State<ChartsScreen> {
   void _playAll({bool shuffle = false}) {
     final page = _page;
     if (page == null) return;
-    final allSongs = <MediaMetadata>[];
+    final allSongs = <SongItem>[];
     for (final sec in page.sections) {
       for (final item in sec.items) {
         if (item is SongItem) {
-          allSongs.add(MediaMetadata.fromSongItem(item));
+          allSongs.add(item);
         }
       }
     }
     if (allSongs.isNotEmpty) {
-      if (shuffle) allSongs.shuffle();
-      player.playQueue(ListQueue(allSongs));
+      player.playSongItems(allSongs, title: 'Top Charts', shuffle: shuffle);
     }
   }
 
@@ -259,7 +259,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
       ),
       onTap: () {
         final meta = MediaMetadata.fromSongItem(item);
-        player.play(meta);
+        player.playSong(meta);
       },
     );
   }

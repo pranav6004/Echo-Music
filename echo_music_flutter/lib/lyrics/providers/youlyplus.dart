@@ -32,7 +32,7 @@ class YouLyPlusProvider {
     int durationSec, {
     String? album,
   }) async {
-    final cleanTitle = LyricsUtils.cleanTitle(title);
+    final cleanTitle = MetadataCleaner.cleanTitle(title);
     for (final host in _servers) {
       try {
         final res = await _dio.get<dynamic>(

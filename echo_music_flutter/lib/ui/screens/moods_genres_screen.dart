@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../innertube/models/yt_item.dart';
+import '../../innertube/pages/pages.dart';
 import '../../innertube/youtube.dart';
 import '../shell/app_navigator.dart';
 import 'browse_screen.dart';
@@ -199,4 +200,9 @@ class _MoodsAndGenresScreenState extends State<MoodsAndGenresScreen> {
 
 
 /// Backward compatibility alias
-typedef MoodsScreen = MoodsAndGenresScreen;
+class MoodsScreen extends StatelessWidget {
+  const MoodsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => const MoodsAndGenresScreen();
+}

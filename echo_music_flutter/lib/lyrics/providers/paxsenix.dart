@@ -24,7 +24,7 @@ class PaxsenixProvider {
     String? album,
   }) async {
     try {
-      final cleanTitle = LyricsUtils.cleanTitle(title);
+      final cleanTitle = MetadataCleaner.cleanTitle(title);
       final query = '$cleanTitle $artist'.trim();
       final res = await _dio.get<dynamic>(
         '/apple-music/search',
