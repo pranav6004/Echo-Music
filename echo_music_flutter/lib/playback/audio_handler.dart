@@ -101,7 +101,18 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
 
   Settings get _settings => Settings.instance;
 
+  double _userVolume = 1.0;
+  double _currentLoudnessFactor = 1.0;
+
+  Future<void> setMasterVolume(double vol) async {
+    _userVolume = vol.clamp(0.0, 1.0);
+    _settings.desktopVolume = _userVolume;
+    await _player.setVolume((_userVolume * _currentLoudnessFactor).clamp(0.0, 1.0));
+  }
+
   Future<void> _init() async {
+    _userVolume = _settings.desktopVolume;
+    unawaited(_player.setVolume(_userVolume));
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.music());
     session.interruptionEventStream.listen((event) {
@@ -736,13 +747,13 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
 
   void _applyNormalization(double? loudnessDb) {
     if (!_settings.audioNormalization || loudnessDb == null) {
-      _player.setVolume(1.0);
-      return;
+      _currentLoudnessFactor = 1.0;
+    } else {
+      // Target -14 LUFS like the Android app's AudioNormalization; only attenuate.
+      final gainDb = (-14.0 - loudnessDb).clamp(-20.0, 0.0);
+      _currentLoudnessFactor = pow(10, gainDb / 20).toDouble().clamp(0.2, 1.0);
     }
-    // Target -14 LUFS like the Android app's AudioNormalization; only attenuate.
-    final gainDb = (-14.0 - loudnessDb).clamp(-20.0, 0.0);
-    final linear = pow(10, gainDb / 20).toDouble();
-    _player.setVolume(linear.clamp(0.2, 1.0));
+    _player.setVolume((_userVolume * _currentLoudnessFactor).clamp(0.0, 1.0));
   }
 
   void _preResolveNext() {

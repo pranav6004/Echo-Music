@@ -442,10 +442,10 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                               tooltip: isMuted ? 'Unmute' : 'Mute',
                               onPressed: () {
                                 if (isMuted) {
-                                  handler.player.setVolume(_lastVolume > 0 ? _lastVolume : 0.8);
+                                  handler.setMasterVolume(_lastVolume > 0 ? _lastVolume : 0.8);
                                 } else {
                                   _lastVolume = vol;
-                                  handler.player.setVolume(0.0);
+                                  handler.setMasterVolume(0.0);
                                 }
                               },
                             ),
@@ -468,7 +468,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                                   value: vol.clamp(0.0, 1.0),
                                   onChanged: (v) {
                                     if (v > 0) _lastVolume = v;
-                                    handler.player.setVolume(v);
+                                    handler.setMasterVolume(v);
                                   },
                                 ),
                               ),

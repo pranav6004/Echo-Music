@@ -1,3 +1,4 @@
+import '../components/items.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/utils.dart';
@@ -174,7 +175,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
         // Sections
         for (final sec in page.sections) ...[
           Padding(
-            padding: const EdgeInsets.only(top: 16, bottom: 8),
+            padding: const EdgeInsets.only(top: 24, bottom: 12),
             child: Text(
               sec.title,
               style: theme.textTheme.titleLarge?.copyWith(
@@ -182,8 +183,12 @@ class _ChartsScreenState extends State<ChartsScreen> {
               ),
             ),
           ),
-          for (var i = 0; i < sec.items.length; i++) ...[
-            _buildChartItem(context, theme, scheme, sec.items[i], i + 1),
+          if (sec.items.isNotEmpty && (sec.items.first is SongItem || sec.items.first is VideoItem)) ...[
+            for (var i = 0; i < sec.items.length; i++) ...[
+              _buildChartItem(context, theme, scheme, sec.items[i], i + 1),
+            ],
+          ] else if (sec.items.isNotEmpty) ...[
+            SectionCarousel(items: sec.items),
           ],
         ],
       ],
@@ -197,7 +202,21 @@ class _ChartsScreenState extends State<ChartsScreen> {
     YTItem item,
     int rank,
   ) {
-    if (item is! SongItem) return const SizedBox.shrink();
+    final SongItem? song = item is SongItem
+        ? item
+        : (item is VideoItem
+            ? SongItem(
+                id: item.id,
+                title: item.title,
+                artists: item.artists,
+                duration: item.duration,
+                thumbnail: item.thumbnail,
+                album: null,
+                explicit: item.explicit,
+              )
+            : null);
+    if (song == null) return const SizedBox.shrink();
+    final it = song;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       leading: Row(
@@ -218,7 +237,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: EchoImage(
-              url: item.thumbnail,
+              url: it.thumbnail,
               width: 48,
               height: 48,
               fit: BoxFit.cover,
@@ -227,7 +246,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
         ],
       ),
       title: Text(
-        item.title,
+        it.title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontWeight: FontWeight.w600),

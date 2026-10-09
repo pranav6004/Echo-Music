@@ -149,6 +149,12 @@ class Settings extends ChangeNotifier {
   bool get wasapiExclusive => _prefs.getBool('wasapiExclusive') ?? false;
   set wasapiExclusive(bool v) => _set('wasapiExclusive', v);
 
+  bool get developerMode => _prefs.getBool('developerMode') ?? false;
+  set developerMode(bool v) => _set('developerMode', v);
+
+  double get desktopVolume => _prefs.getDouble('desktopVolume') ?? 1.0;
+  set desktopVolume(double v) => _set('desktopVolume', v);
+
   bool get savedShuffle => _prefs.getBool('shuffleMode') ?? false;
   set savedShuffle(bool v) => _set('shuffleMode', v);
 

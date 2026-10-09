@@ -1,3 +1,4 @@
+import 'services/log_service.dart';
 import 'dart:io';
 import 'dart:ui';
 
@@ -22,6 +23,7 @@ import 'stream/stream_resolver.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  LogService.instance.init();
   if (Platform.isWindows || Platform.isLinux) {
     // No native sqflite or just_audio plugins here: use SQLite over FFI and
     // play through libmpv (media_kit).

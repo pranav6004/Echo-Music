@@ -1,4 +1,5 @@
 import '../../services/dsp_service.dart';
+import '../../services/log_service.dart';
 import '../screens/equalizer_screen.dart';
 import '../screens/listen_together_screen.dart';
 import 'ai_settings_screen.dart';
@@ -137,11 +138,32 @@ class SettingsScreen extends StatelessWidget {
                 _Row(
                   icon: Icons.info_outline_rounded,
                   title: 'About',
-                  subtitle: 'Echo Music for iOS',
+                  subtitle: Platform.isWindows ? 'Echo Music Desktop' : 'Echo Music',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const AboutScreen()),
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _Group(
+              children: [
+                _Row(
+                  icon: Icons.developer_mode_rounded,
+                  title: 'Developer mode',
+                  subtitle: 'Enable debugging tools & system logs',
+                  trailing: Switch(
+                    value: s.developerMode,
+                    onChanged: (v) => s.developerMode = v,
+                  ),
+                ),
+                if (s.developerMode)
+                  _Row(
+                    icon: Icons.terminal_rounded,
+                    title: 'System logs',
+                    subtitle: 'Inspect live app logs, copy & export',
+                    onTap: () => _showLogsViewer(context),
+                  ),
               ],
             ),
           ],
@@ -1327,6 +1349,219 @@ class _IntegrationsSettingsState extends State<IntegrationsSettings> {
             child: const Text('Save'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+void _showLogsViewer(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (ctx) => const _LogsViewerDialog(),
+  );
+}
+
+class _LogsViewerDialog extends StatefulWidget {
+  const _LogsViewerDialog();
+
+  @override
+  State<_LogsViewerDialog> createState() => _LogsViewerDialogState();
+}
+
+class _LogsViewerDialogState extends State<_LogsViewerDialog> {
+  final _searchController = TextEditingController();
+  String _filter = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final logService = LogService.instance;
+
+    return Dialog(
+      backgroundColor: scheme.surface,
+      surfaceTintColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 800, maxHeight: 650),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.terminal_rounded, color: scheme.onPrimaryContainer, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('System Logs', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        ListenableBuilder(
+                          listenable: logService,
+                          builder: (context, _) => Text(
+                            '${logService.logs.length} entries buffered (max 500)',
+                            style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Copy all logs',
+                    icon: const Icon(Icons.copy_rounded, size: 20),
+                    onPressed: () async {
+                      await logService.copyAll();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Logs copied to clipboard')),
+                        );
+                      }
+                    },
+                  ),
+                  IconButton(
+                    tooltip: 'Clear logs',
+                    icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                    onPressed: () => logService.clear(),
+                  ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    tooltip: 'Close',
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Filter logs by tag or text...',
+                  prefixIcon: const Icon(Icons.search_rounded, size: 18),
+                  isDense: true,
+                  filled: true,
+                  fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onChanged: (v) => setState(() => _filter = v.trim().toLowerCase()),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F1117),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: ListenableBuilder(
+                    listenable: logService,
+                    builder: (context, _) {
+                      final all = logService.logs;
+                      final filtered = _filter.isEmpty
+                          ? all
+                          : all.where((e) =>
+                              e.tag.toLowerCase().contains(_filter) ||
+                              e.message.toLowerCase().contains(_filter)).toList();
+
+                      if (filtered.isEmpty) {
+                        return Center(
+                          child: Text(
+                            all.isEmpty ? 'No logs captured yet.' : 'No matching logs for "$_filter"',
+                            style: const TextStyle(color: Colors.grey, fontSize: 13),
+                          ),
+                        );
+                      }
+
+                      return SelectionArea(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, idx) {
+                            final e = filtered[idx];
+                            Color tagColor = const Color(0xFF64B5F6);
+                            if (e.tag == 'player') tagColor = const Color(0xFF81C784);
+                            if (e.tag == 'stream') tagColor = const Color(0xFFFFB74D);
+                            if (e.tag == 'lossless') tagColor = const Color(0xFFBA68C8);
+                            if (e.tag == 'error' || e.message.toLowerCase().contains('error')) {
+                              tagColor = const Color(0xFFE57373);
+                            }
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2.5),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    e.formattedTime,
+                                    style: TextStyle(
+                                      fontFamily: 'Consolas, monospace',
+                                      fontSize: 11,
+                                      color: Colors.white.withValues(alpha: 0.4),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: tagColor.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      e.tag,
+                                      style: TextStyle(
+                                        fontFamily: 'Consolas, monospace',
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: tagColor,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      e.message,
+                                      style: const TextStyle(
+                                        fontFamily: 'Consolas, monospace',
+                                        fontSize: 12,
+                                        color: Color(0xFFE0E0E0),
+                                        height: 1.3,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
