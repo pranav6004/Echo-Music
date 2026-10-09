@@ -174,21 +174,27 @@ class _ChartsScreenState extends State<ChartsScreen> {
 
         // Sections
         for (final sec in page.sections) ...[
-          Padding(
-            padding: const EdgeInsets.only(top: 24, bottom: 12),
-            child: Text(
-              sec.title,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
+          if (sec.items.isEmpty) continue,
+          if (sec.items.first is SongItem) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: 24, bottom: 12),
+              child: Text(
+                sec.title,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
-          ),
-          if (sec.items.isNotEmpty && (sec.items.first is SongItem || sec.items.first is VideoItem)) ...[
             for (var i = 0; i < sec.items.length; i++) ...[
-              _buildChartItem(context, theme, scheme, sec.items[i], i + 1),
+              if (sec.items[i] is SongItem)
+                _buildChartItem(context, theme, scheme, sec.items[i] as SongItem, i + 1),
             ],
-          ] else if (sec.items.isNotEmpty) ...[
-            SectionCarousel(items: sec.items),
+          ] else ...[
+            const SizedBox(height: 16),
+            SectionCarousel(
+              title: sec.title,
+              items: sec.items,
+            ),
           ],
         ],
       ],
@@ -199,24 +205,9 @@ class _ChartsScreenState extends State<ChartsScreen> {
     BuildContext context,
     ThemeData theme,
     ColorScheme scheme,
-    YTItem item,
+    SongItem item,
     int rank,
   ) {
-    final SongItem? song = item is SongItem
-        ? item
-        : (item is VideoItem
-            ? SongItem(
-                id: item.id,
-                title: item.title,
-                artists: item.artists,
-                duration: item.duration,
-                thumbnail: item.thumbnail,
-                album: null,
-                explicit: item.explicit,
-              )
-            : null);
-    if (song == null) return const SizedBox.shrink();
-    final it = song;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       leading: Row(
@@ -237,7 +228,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: EchoImage(
-              url: it.thumbnail,
+              url: item.thumbnail,
               width: 48,
               height: 48,
               fit: BoxFit.cover,
@@ -246,13 +237,13 @@ class _ChartsScreenState extends State<ChartsScreen> {
         ],
       ),
       title: Text(
-        it.title,
+        item.title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontWeight: FontWeight.w600),
       ),
       subtitle: Text(
-        item.artists.map((a) => a.name).join(', '),
+        item.artistsText,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(color: scheme.onSurfaceVariant),
