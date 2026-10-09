@@ -251,4 +251,30 @@ class Settings extends ChangeNotifier {
 
   int get maxImageCacheMb => _prefs.getInt('maxImageCacheSize') ?? 512;
   set maxImageCacheMb(int v) => _set('maxImageCacheSize', v);
+
+  // --- Content & Blocked Artists ----------------------------------------
+  Set<String> get blockedArtists =>
+      (_prefs.getStringList('blockedArtists') ?? const []).toSet();
+
+  Future<void> blockArtist(String name) async {
+    final clean = name.trim();
+    if (clean.isEmpty) return;
+    final cur = blockedArtists;
+    cur.add(clean);
+    await _prefs.setStringList('blockedArtists', cur.toList());
+    notifyListeners();
+  }
+
+  Future<void> unblockArtist(String name) async {
+    final clean = name.trim();
+    final cur = blockedArtists;
+    cur.remove(clean);
+    await _prefs.setStringList('blockedArtists', cur.toList());
+    notifyListeners();
+  }
+
+  bool isArtistBlocked(String name) {
+    final clean = name.trim().toLowerCase();
+    return blockedArtists.any((b) => b.trim().toLowerCase() == clean);
+  }
 }

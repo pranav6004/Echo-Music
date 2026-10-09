@@ -1559,4 +1559,62 @@ class AppDatabase {
         )
         .toList();
   }
+
+  // --- Backup & Restore --------------------------------------------------
+
+  Future<Map<String, dynamic>> exportBackup() async {
+    final d = await db;
+    return {
+      'version': 1,
+      'app': 'Echo Music',
+      'exportedAt': DateTime.now().toIso8601String(),
+      'tables': {
+        'song': await d.query('song'),
+        'artist': await d.query('artist'),
+        'album': await d.query('album'),
+        'song_artist_map': await d.query('song_artist_map'),
+        'song_album_map': await d.query('song_album_map'),
+        'playlist': await d.query('playlist'),
+        'playlist_song_map': await d.query('playlist_song_map'),
+        'event': await d.query('event'),
+        'search_history': await d.query('search_history'),
+      },
+    };
+  }
+
+  Future<int> importBackup(Map<String, dynamic> data) async {
+    final d = await db;
+    final tables = data['tables'] as Map<String, dynamic>? ?? {};
+    var restoredRows = 0;
+
+    await d.transaction((txn) async {
+      for (final table in [
+        'artist',
+        'album',
+        'song',
+        'song_artist_map',
+        'song_album_map',
+        'playlist',
+        'playlist_song_map',
+        'event',
+        'search_history',
+      ]) {
+        final rows = tables[table] as List<dynamic>? ?? [];
+        for (final item in rows) {
+          if (item is Map) {
+            final row = Map<String, dynamic>.from(item);
+            await txn.insert(
+              table,
+              row,
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+            restoredRows++;
+          }
+        }
+      }
+    });
+
+    _changes.add(null);
+    return restoredRows;
+  }
 }

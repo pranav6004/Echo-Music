@@ -400,6 +400,32 @@ Future<void> showArtistMenu(BuildContext context, ArtistItem artist) async {
           ShareParams(uri: Uri.parse(artist.shareLink)),
         ),
       ),
+      _MenuAction(
+        Settings.instance.isArtistBlocked(artist.title)
+            ? Icons.check_circle_outline_rounded
+            : Icons.block_rounded,
+        Settings.instance.isArtistBlocked(artist.title)
+            ? 'Unblock artist'
+            : 'Block artist',
+        () async {
+          final s = Settings.instance;
+          if (s.isArtistBlocked(artist.title)) {
+            await s.unblockArtist(artist.title);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Unblocked ${artist.title}')),
+              );
+            }
+          } else {
+            await s.blockArtist(artist.title);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Blocked ${artist.title} from autoplay & recommendations')),
+              );
+            }
+          }
+        },
+      ),
     ],
   );
 }

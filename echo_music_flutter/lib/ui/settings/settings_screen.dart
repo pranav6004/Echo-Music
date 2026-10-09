@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'blocked_artists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -601,6 +606,16 @@ class ContentSettings extends StatelessWidget {
               value: s.hideYoutubeShorts,
               onChanged: (v) => s.hideYoutubeShorts = v,
             ),
+            _Row(
+              icon: Icons.person_off_rounded,
+              title: 'Blocked artists',
+              subtitle: '${s.blockedArtists.length} artists blocked',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const BlockedArtistsScreen(),
+                ),
+              ),
+            ),
           ],
         ),
         _Group(
@@ -763,6 +778,22 @@ class _StorageSettingsState extends State<StorageSettings> {
     return _SettingsPage(
       title: 'Storage',
       groups: [
+        _Group(
+          children: [
+            _Row(
+              icon: Icons.backup_outlined,
+              title: 'Backup library',
+              subtitle: 'Export playlists, songs, favorites & settings to JSON',
+              onTap: () => _handleBackup(context),
+            ),
+            _Row(
+              icon: Icons.restore_outlined,
+              title: 'Restore library',
+              subtitle: 'Import a previously saved .json backup file',
+              onTap: () => _handleRestore(context),
+            ),
+          ],
+        ),
         _Group(
           children: [
             _Row(

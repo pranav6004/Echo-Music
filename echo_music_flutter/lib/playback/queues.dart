@@ -1,6 +1,15 @@
+import '../data/settings.dart';
 import '../innertube/models/yt_item.dart';
 import '../innertube/youtube.dart';
 import 'media_metadata.dart';
+
+
+bool _isSongAllowed(MediaMetadata m) {
+  final blocked = Settings.instance.blockedArtists;
+  if (blocked.isEmpty) return true;
+  final blockedLower = blocked.map((b) => b.trim().toLowerCase()).toSet();
+  return !m.artists.any((a) => blockedLower.contains(a.name.trim().toLowerCase()));
+}
 
 class QueueStatus {
   final String? title;
@@ -111,7 +120,7 @@ class YouTubeQueue implements PlayQueue {
         _continuation = result.continuation;
         return QueueStatus(
           title: result.title,
-          items: result.items.map(MediaMetadata.fromSongItem).toList(),
+          items: result.items.map(MediaMetadata.fromSongItem).where(_isSongAllowed).toList(),
           mediaItemIndex: result.currentIndex ?? 0,
         );
       } catch (e) {
@@ -143,7 +152,7 @@ class YouTubeQueue implements PlayQueue {
         );
         endpoint = result.endpoint;
         _continuation = result.continuation;
-        return result.items.map(MediaMetadata.fromSongItem).toList();
+        return result.items.map(MediaMetadata.fromSongItem).where(_isSongAllowed).toList();
       } catch (e) {
         lastError = e;
       }
@@ -174,7 +183,7 @@ class YouTubeAlbumRadio implements PlayQueue {
     _albumSongCount = songs.length;
     return QueueStatus(
       title: albumTitle ?? songs.firstOrNull?.album?.name,
-      items: songs.map(MediaMetadata.fromSongItem).toList(),
+      items: songs.map(MediaMetadata.fromSongItem).where(_isSongAllowed).toList(),
       mediaItemIndex: 0,
     );
   }
@@ -189,7 +198,7 @@ class YouTubeAlbumRadio implements PlayQueue {
       continuation: _continuation,
     );
     _continuation = result.continuation;
-    final items = result.items.map(MediaMetadata.fromSongItem).toList();
+    final items = result.items.map(MediaMetadata.fromSongItem).where(_isSongAllowed).toList();
     if (!_firstTimeLoaded) {
       _firstTimeLoaded = true;
       return items.length > _albumSongCount
