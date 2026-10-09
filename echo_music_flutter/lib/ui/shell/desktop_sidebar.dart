@@ -187,6 +187,12 @@ class DesktopSidebar extends StatelessWidget {
                   label: 'Import Spotify',
                   onTap: AppNavigator.openSpotifyImporter,
                 ),
+                _SidebarShortcutTile(
+                  icon: Icons.podcasts_rounded,
+                  iconColor: Colors.pinkAccent,
+                  label: 'Party Rooms',
+                  onTap: AppNavigator.openPartyRooms,
+                ),
               ],
             ),
           ),

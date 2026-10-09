@@ -16,6 +16,7 @@ import '../screens/ai_hub_screen.dart';
 import '../screens/equalizer_screen.dart';
 import '../screens/spotify_import_screen.dart';
 import '../screens/search_screen.dart';
+import '../screens/listen_together_screen.dart';
 import '../settings/settings_screen.dart';
 
 /// Navigation helper: each bottom tab owns a nested [Navigator]; detail
@@ -93,6 +94,7 @@ class AppNavigator {
   static void openSpotifyImporter() => push(const SpotifyImportScreen());
   static void openAiHub() => push(const AiHubScreen());
   static void openEqualizer() => push(const EqualizerScreen());
+  static void openPartyRooms() => push(const ListenTogetherScreen());
 
 
   static void openHistory() => push(const HistoryScreen());

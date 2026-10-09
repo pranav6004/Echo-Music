@@ -364,6 +364,16 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                       tooltip: 'Equalizer & DSP',
                       onPressed: AppNavigator.openEqualizer,
                     ),
+                    // Party Rooms button
+                    IconButton(
+                      icon: Icon(
+                        Icons.podcasts_rounded,
+                        size: 20,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                      tooltip: 'Party Rooms',
+                      onPressed: AppNavigator.openPartyRooms,
+                    ),
                     // Queue side toggle
                     IconButton(
                       icon: Icon(

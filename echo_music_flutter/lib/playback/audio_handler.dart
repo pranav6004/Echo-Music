@@ -16,6 +16,9 @@ import '../innertube/youtube_client.dart';
 import '../stream/stream_resolver.dart';
 import '../services/discord_rpc_service.dart';
 import '../services/scrobble_service.dart';
+import '../services/canvas_service.dart';
+import '../services/listen_together_service.dart';
+import '../innertube/models/yt_item.dart';
 import 'media_metadata.dart';
 import 'queues.dart';
 
@@ -135,6 +138,16 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
           isPlaying: _player.playing,
         );
         ScrobbleService.instance.onTrackStarted(meta);
+        CanvasService.instance.updateCurrentTrack(
+          title: meta.title,
+          artist: meta.artistsText,
+          album: meta.album?.title,
+        );
+        ListenTogetherService.instance.broadcastPlayback(
+          metadata: meta,
+          isPlaying: _player.playing,
+          position: _player.position,
+        );
       } else {
         DiscordRpcService.instance.clearPresence();
       }
@@ -148,8 +161,35 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
           position: _player.position,
           isPlaying: playing,
         );
+        ListenTogetherService.instance.broadcastPlayback(
+          metadata: meta,
+          isPlaying: playing,
+          position: _player.position,
+        );
       }
     });
+
+    ListenTogetherService.instance.onSyncRequest = (track, play, posMs) async {
+      if (currentMetadata.value?.id != track.id) {
+        await playItems([
+          MediaMetadata(
+            id: track.id,
+            title: track.title,
+            artists: [Artist(id: '', name: track.artist)],
+            thumbnailUrl: track.thumbnail,
+            duration: track.duration,
+          ),
+        ]);
+      }
+      if (posMs > 0 && (_player.position.inMilliseconds - posMs).abs() > 3000) {
+        await _player.seek(Duration(milliseconds: posMs));
+      }
+      if (play && !_player.playing) {
+        await _player.play();
+      } else if (!play && _player.playing) {
+        await _player.pause();
+      }
+    };
 
     _player.positionStream.listen((pos) {
       final meta = currentMetadata.value;

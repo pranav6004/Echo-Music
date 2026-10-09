@@ -1,4 +1,5 @@
 import '../screens/equalizer_screen.dart';
+import '../screens/listen_together_screen.dart';
 import 'ai_settings_screen.dart';
 import '../screens/spotify_import_screen.dart';
 import 'dart:convert';
@@ -114,6 +115,16 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => const IntegrationsSettings(),
+                    ),
+                  ),
+                ),
+                _Row(
+                  icon: Icons.podcasts_rounded,
+                  title: 'Party Rooms',
+                  subtitle: 'Real-time room playback sync with friends',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ListenTogetherScreen(),
                     ),
                   ),
                 ),

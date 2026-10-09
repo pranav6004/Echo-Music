@@ -18,6 +18,7 @@ import 'lyrics_view.dart';
 import 'player_palette.dart';
 import 'queue_sheet.dart';
 import '../components/watch_builder.dart';
+import '../components/canvas_background.dart';
 
 /// Full-screen now-playing view — Apple-Music-inspired full-bleed artwork
 /// with a blurred backdrop (port of `Player.kt` "new player design").
@@ -166,7 +167,9 @@ class _Background extends StatelessWidget {
     if (style == PlayerBackgroundStyle.plain) {
       return Container(color: scheme.surface);
     }
-    return Stack(
+    return CanvasBackground(
+      fallbackArtworkUrl: url,
+      child: Stack(
       fit: StackFit.expand,
       children: [
         if (style == PlayerBackgroundStyle.blur)
@@ -202,6 +205,7 @@ class _Background extends StatelessWidget {
           ),
         ),
       ],
+      ),
     );
   }
 }
