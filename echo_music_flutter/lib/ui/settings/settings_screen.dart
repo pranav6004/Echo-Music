@@ -1,3 +1,4 @@
+import 'ai_settings_screen.dart';
 import '../screens/spotify_import_screen.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -93,6 +94,16 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: 'Downloads and caches',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const StorageSettings()),
+                  ),
+                ),
+                _Row(
+                  icon: Icons.auto_awesome_rounded,
+                  title: 'AI Hub',
+                  subtitle: 'LLM providers, models, API keys',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const AiSettingsScreen(),
+                    ),
                   ),
                 ),
                 _Row(

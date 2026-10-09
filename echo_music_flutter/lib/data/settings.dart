@@ -305,4 +305,14 @@ class Settings extends ChangeNotifier {
   set enableListenBrainz(bool v) => _set('enableListenBrainz', v);
   String get listenBrainzToken => _prefs.getString('listenBrainzToken') ?? '';
   set listenBrainzToken(String v) => _set('listenBrainzToken', v);
+
+  // AI Hub & LLM
+  String get aiProvider => _prefs.getString('aiProvider') ?? 'openrouter';
+  set aiProvider(String v) => _set('aiProvider', v);
+  String get aiApiKey => _prefs.getString('aiApiKey') ?? '';
+  set aiApiKey(String v) => _set('aiApiKey', v);
+  String get aiModel => _prefs.getString('aiModel') ?? 'google/gemini-2.0-flash-exp:free';
+  set aiModel(String v) => _set('aiModel', v);
+  String get aiCustomEndpoint => _prefs.getString('aiCustomEndpoint') ?? 'http://localhost:20128/v1/chat/completions';
+  set aiCustomEndpoint(String v) => _set('aiCustomEndpoint', v);
 }

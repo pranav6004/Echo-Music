@@ -170,6 +170,12 @@ class DesktopSidebar extends StatelessWidget {
                   onTap: AppNavigator.openMoodsAndGenres,
                 ),
                 _SidebarShortcutTile(
+                  icon: Icons.auto_awesome_rounded,
+                  iconColor: Colors.purpleAccent,
+                  label: 'AI Music Hub',
+                  onTap: AppNavigator.openAiHub,
+                ),
+                _SidebarShortcutTile(
                   icon: Icons.sync_alt_rounded,
                   iconColor: const Color(0xFF1DB954),
                   label: 'Import Spotify',
