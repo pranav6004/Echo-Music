@@ -765,6 +765,136 @@ class StorageSettings extends StatefulWidget {
 class _StorageSettingsState extends State<StorageSettings> {
   int _downloadBytes = 0;
 
+  Future<void> _handleBackup(BuildContext context) async {
+    try {
+      final data = await AppDatabase.instance.exportBackup();
+      data['settings'] = {
+        'blockedArtists': Settings.instance.blockedArtists.toList(),
+      };
+      final jsonStr = const JsonEncoder.withIndent('  ').convert(data);
+
+      Directory? dir;
+      if (Platform.isWindows) {
+        final userProfile = Platform.environment['USERPROFILE'];
+        if (userProfile != null) {
+          dir = Directory(p.join(userProfile, 'Downloads'));
+        }
+      }
+      dir ??= await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
+
+      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-').split('.').first;
+      final file = File(p.join(dir.path, 'echo_music_backup_$timestamp.json'));
+      await file.writeAsString(jsonStr, encoding: utf8);
+
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Backup Created'),
+            content: Text('Library successfully backed up to:\n\n${file.path}'),
+            actions: [
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnack(context, 'Backup failed: $e');
+      }
+    }
+  }
+
+  Future<void> _handleRestore(BuildContext context) async {
+    final controller = TextEditingController();
+    String? defaultPath;
+    try {
+      Directory? dir;
+      if (Platform.isWindows) {
+        final userProfile = Platform.environment['USERPROFILE'];
+        if (userProfile != null) dir = Directory(p.join(userProfile, 'Downloads'));
+      }
+      dir ??= await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
+      if (await dir.exists()) {
+        final list = dir.listSync().whereType<File>().where((f) => f.path.contains('echo_music_backup_')).toList();
+        if (list.isNotEmpty) {
+          list.sort((a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()));
+          defaultPath = list.first.path;
+        }
+      }
+    } catch (_) {}
+
+    if (defaultPath != null) controller.text = defaultPath;
+
+    if (!context.mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Restore Library'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Enter the full path to an Echo Music JSON backup file:',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'C:\\Users\\...\\Downloads\\echo_music_backup.json',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final path = controller.text.trim();
+              Navigator.of(ctx).pop();
+              if (path.isEmpty) return;
+              try {
+                final file = File(path);
+                if (!await file.exists()) {
+                  if (context.mounted) showSnack(context, 'File not found: $path');
+                  return;
+                }
+                final raw = await file.readAsString(encoding: utf8);
+                final map = jsonDecode(raw) as Map<String, dynamic>;
+                final count = await AppDatabase.instance.importBackup(map);
+                if (map['settings'] is Map) {
+                  final s = map['settings'] as Map<String, dynamic>;
+                  final blocked = s['blockedArtists'] as List?;
+                  if (blocked != null) {
+                    for (final b in blocked) {
+                      await Settings.instance.blockArtist(b.toString());
+                    }
+                  }
+                }
+                if (context.mounted) {
+                  showSnack(context, 'Library restored ($count items)');
+                }
+              } catch (e) {
+                if (context.mounted) showSnack(context, 'Restore error: $e');
+              }
+            },
+            child: const Text('Restore'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
