@@ -123,7 +123,7 @@ class SpotifyImporter {
     required SpotifyPlaylistData data,
     required void Function(int current, int total, String trackName) onProgress,
   }) async {
-    final db = Database.instance;
+    final db = AppDatabase.instance;
     final yt = YouTube.instance;
 
     // 1. Create Playlist in database
@@ -141,7 +141,7 @@ class SpotifyImporter {
 
       try {
         final query = '${track.title} ${track.artist}'.trim();
-        final searchRes = await yt.search(query, filter: SearchFilter.song);
+        final searchRes = await yt.search(query, YouTube.filterSong);
         final songs = searchRes.items.whereType<SongItem>().toList();
 
         if (songs.isNotEmpty) {

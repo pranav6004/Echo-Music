@@ -180,7 +180,7 @@ class DiscordRpcService {
       title: metadata.title,
       artist: metadata.artistsText,
       album: metadata.album?.name,
-      artworkUrl: metadata.thumbnail,
+      artworkUrl: metadata.thumbnailUrl,
       durationSec: metadata.duration,
       elapsedSec: position.inSeconds,
       isPlaying: isPlaying,

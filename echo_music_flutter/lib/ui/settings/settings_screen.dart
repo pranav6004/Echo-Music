@@ -1111,7 +1111,6 @@ class _IntegrationsSettingsState extends State<IntegrationsSettings> {
       title: 'Integrations & Social',
       groups: [
         _Group(
-          title: 'DISCORD',
           children: [
             _Switch(
               icon: Icons.games_rounded,
@@ -1126,7 +1125,6 @@ class _IntegrationsSettingsState extends State<IntegrationsSettings> {
           ],
         ),
         _Group(
-          title: 'SCROBBLING',
           children: [
             _Switch(
               icon: Icons.radio_rounded,
@@ -1169,7 +1167,6 @@ class _IntegrationsSettingsState extends State<IntegrationsSettings> {
           ],
         ),
         _Group(
-          title: 'PLAYLIST TOOLS',
           children: [
             _Row(
               icon: Icons.sync_alt_rounded,
