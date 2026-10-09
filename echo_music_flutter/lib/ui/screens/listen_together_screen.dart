@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../services/listen_together_service.dart';
+import '../shell/app_navigator.dart';
 
 class ListenTogetherScreen extends StatefulWidget {
   const ListenTogetherScreen({super.key});
@@ -27,140 +28,202 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
     super.dispose();
   }
 
+  void _handleBack(BuildContext context) {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else if (Navigator.of(context, rootNavigator: true).canPop()) {
+      Navigator.of(context, rootNavigator: true).pop();
+    } else {
+      AppNavigator.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AnimatedBuilder(
-        animation: ListenTogetherService.instance,
-        builder: (context, _) {
-          final svc = ListenTogetherService.instance;
-          final isInRoom = svc.isConnected && svc.roomCode != null;
-
-          return CustomScrollView(
-            slivers: [
-              // Header
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(28, 32, 28, 16),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.purpleAccent.shade400,
-                              Colors.deepPurple.shade600,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.purpleAccent.withOpacity(0.35),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.podcasts_rounded,
-                          color: Colors.white,
-                          size: 28,
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): () => _handleBack(context),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: const Text('Party Rooms'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              tooltip: 'Back',
+              onPressed: () => _handleBack(context),
+            ),
+            actions: [
+              AnimatedBuilder(
+                animation: ListenTogetherService.instance,
+                builder: (context, _) {
+                  final svc = ListenTogetherService.instance;
+                  if (svc.isConnected && svc.roomCode != null) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: FilledButton.tonalIcon(
+                        onPressed: () => svc.leaveRoom(),
+                        icon: const Icon(Icons.exit_to_app_rounded, size: 18),
+                        label: const Text('Leave Room'),
+                        style: FilledButton.styleFrom(
+                          foregroundColor: theme.colorScheme.error,
+                          backgroundColor:
+                              theme.colorScheme.errorContainer.withOpacity(0.4),
                         ),
                       ),
-                      const SizedBox(width: 18),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Party Rooms',
-                              style: theme.textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Listen together in real-time with zero audio latency',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (isInRoom)
-                        FilledButton.tonalIcon(
-                          onPressed: () => svc.leaveRoom(),
-                          icon: const Icon(Icons.exit_to_app_rounded, size: 18),
-                          label: const Text('Leave Room'),
-                          style: FilledButton.styleFrom(
-                            foregroundColor: theme.colorScheme.error,
-                            backgroundColor: theme.colorScheme.errorContainer.withOpacity(0.4),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
+            ],
+          ),
+          body: AnimatedBuilder(
+            animation: ListenTogetherService.instance,
+            builder: (context, _) {
+              final svc = ListenTogetherService.instance;
+              final isInRoom = svc.isConnected && svc.roomCode != null;
 
-              // Status message bar if any
-              if (svc.statusMessage != null)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: theme.colorScheme.outlineVariant.withOpacity(0.3),
-                        ),
-                      ),
+              return CustomScrollView(
+                slivers: [
+                  // Header Banner
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(28, 20, 28, 16),
                       child: Row(
                         children: [
-                          Icon(
-                            svc.isConnecting
-                                ? Icons.sync_rounded
-                                : Icons.info_outline_rounded,
-                            size: 18,
-                            color: theme.colorScheme.primary,
+                          IconButton.filledTonal(
+                            icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                            tooltip: 'Back',
+                            onPressed: () => _handleBack(context),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              svc.statusMessage!,
-                              style: theme.textTheme.bodySmall,
+                          const SizedBox(width: 16),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.purpleAccent.shade400,
+                                  Colors.deepPurple.shade600,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.purpleAccent.withOpacity(0.35),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.podcasts_rounded,
+                              color: Colors.white,
+                              size: 28,
                             ),
                           ),
-                          if (svc.isConnecting)
-                            const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                          const SizedBox(width: 18),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Party Rooms',
+                                  style: theme.textTheme.headlineMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Listen together in real-time with zero audio latency',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isInRoom)
+                            FilledButton.tonalIcon(
+                              onPressed: () => svc.leaveRoom(),
+                              icon: const Icon(Icons.exit_to_app_rounded, size: 18),
+                              label: const Text('Leave Room'),
+                              style: FilledButton.styleFrom(
+                                foregroundColor: theme.colorScheme.error,
+                                backgroundColor:
+                                    theme.colorScheme.errorContainer.withOpacity(0.4),
+                              ),
                             ),
                         ],
                       ),
                     ),
                   ),
-                ),
 
-              // Main Body Content
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(28, 12, 28, 48),
-                sliver: isInRoom
-                    ? SliverToBoxAdapter(child: _buildActiveRoomView(context, svc, theme))
-                    : SliverToBoxAdapter(child: _buildLobbyView(context, svc, theme, isDark)),
-              ),
-            ],
-          );
-        },
+                  // Status message bar if any
+                  if (svc.statusMessage != null)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: theme.colorScheme.outlineVariant
+                                  .withOpacity(0.3),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                svc.isConnecting
+                                    ? Icons.sync_rounded
+                                    : Icons.info_outline_rounded,
+                                size: 18,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  svc.statusMessage!,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ),
+                              if (svc.isConnecting)
+                                const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  // Main Body Content
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(28, 12, 28, 48),
+                    sliver: isInRoom
+                        ? SliverToBoxAdapter(
+                            child: _buildActiveRoomView(context, svc, theme))
+                        : SliverToBoxAdapter(
+                            child: _buildLobbyView(
+                                context, svc, theme, isDark)),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -180,7 +243,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceVariant.withOpacity(0.35),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.3)),
+            border: Border.all(
+                color: theme.colorScheme.outlineVariant.withOpacity(0.3)),
           ),
           child: Row(
             children: [
@@ -214,7 +278,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
               _buildActionCard(
                 theme: theme,
                 title: 'Host a Room',
-                subtitle: 'Generate a unique room code and control playback for all listeners.',
+                subtitle:
+                    'Generate a unique room code and control playback for all listeners.',
                 icon: Icons.add_circle_outline_rounded,
                 iconColor: Colors.purpleAccent,
                 buttonLabel: 'Create Room',
@@ -230,7 +295,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
               _buildActionCard(
                 theme: theme,
                 title: 'Join a Room',
-                subtitle: 'Enter a 6-character room code to sync playback with a friend.',
+                subtitle:
+                    'Enter a 6-character room code to sync playback with a friend.',
                 icon: Icons.group_add_rounded,
                 iconColor: Colors.blueAccent,
                 buttonLabel: 'Join Session',
@@ -248,14 +314,17 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
                     hintText: 'ROOM CODE',
                     hintStyle: TextStyle(
                       letterSpacing: 2,
-                      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                      color:
+                          theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
                     ),
                     filled: true,
                     fillColor: theme.colorScheme.surface.withOpacity(0.5),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: theme.colorScheme.outlineVariant.withOpacity(0.5)),
+                      borderSide: BorderSide(
+                          color: theme.colorScheme.outlineVariant
+                              .withOpacity(0.5)),
                     ),
                   ),
                 ),
@@ -310,7 +379,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.35)),
+        border: Border.all(
+            color: theme.colorScheme.outlineVariant.withOpacity(0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,7 +398,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
               const SizedBox(width: 14),
               Text(
                 title,
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -353,13 +424,15 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
                   ? const SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
                     )
                   : Icon(buttonIcon, size: 18),
               label: Text(buttonLabel),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
               ),
             ),
           ),
@@ -403,7 +476,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: svc.isHost
                           ? Colors.amber.withOpacity(0.2)
@@ -458,7 +532,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
                   if (svc.roomCode != null) {
                     Clipboard.setData(ClipboardData(text: svc.roomCode!));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Room code copied to clipboard!')),
+                      const SnackBar(
+                          content: Text('Room code copied to clipboard!')),
                     );
                   }
                 },
@@ -467,7 +542,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: const BorderSide(color: Colors.white30),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ],
@@ -491,7 +567,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceVariant.withOpacity(0.35),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.3)),
+              border: Border.all(
+                  color: theme.colorScheme.outlineVariant.withOpacity(0.3)),
             ),
             child: Row(
               children: [
@@ -524,7 +601,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
                     children: [
                       Text(
                         svc.currentTrack!.title,
-                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -541,7 +619,9 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
                   ),
                 ),
                 Icon(
-                  svc.isPlaying ? Icons.play_circle_filled_rounded : Icons.pause_circle_filled_rounded,
+                  svc.isPlaying
+                      ? Icons.play_circle_filled_rounded
+                      : Icons.pause_circle_filled_rounded,
                   color: theme.colorScheme.primary,
                   size: 32,
                 ),
@@ -565,7 +645,8 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceVariant.withOpacity(0.35),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.3)),
+            border: Border.all(
+                color: theme.colorScheme.outlineVariant.withOpacity(0.3)),
           ),
           child: ListView.separated(
             shrinkWrap: true,
@@ -586,17 +667,20 @@ class _ListenTogetherScreenState extends State<ListenTogetherScreen> {
                     m.username.isNotEmpty ? m.username[0].toUpperCase() : '?',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: m.isHost ? Colors.amber : theme.colorScheme.primary,
+                      color:
+                          m.isHost ? Colors.amber : theme.colorScheme.primary,
                     ),
                   ),
                 ),
                 title: Text(
                   m.username,
-                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 trailing: m.isHost
                     ? Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: Colors.amber.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(6),
