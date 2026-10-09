@@ -327,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen>
                   children: [
                     NavigationTitle(
                       title: 'Mood & genres',
-                      onTap: () => AppNavigator.push(const MoodsScreen()),
+                      onTap: AppNavigator.openMoodsAndGenres,
                     ),
                     SizedBox(
                       height: 100,

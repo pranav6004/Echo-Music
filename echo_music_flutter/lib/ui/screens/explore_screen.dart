@@ -13,6 +13,11 @@ import 'charts_screen.dart';
 import 'moods_genres_screen.dart';
 import 'new_releases_screen.dart';
 
+export 'charts_screen.dart';
+export 'moods_genres_screen.dart';
+export 'new_releases_screen.dart';
+
+
 
 /// Explore — new releases, moods & genres, and charts (port of
 /// `ExploreScreen.kt` + `ChartsScreen.kt`).

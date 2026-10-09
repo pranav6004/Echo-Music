@@ -4,9 +4,7 @@ import '../../core/utils.dart';
 import '../../innertube/models/yt_item.dart';
 import '../../innertube/pages/pages.dart';
 import '../../innertube/youtube.dart';
-import '../../playback/media_metadata.dart';
 import '../../playback/player_controller.dart';
-import '../../playback/queues.dart';
 import '../components/common.dart';
 import '../components/menus.dart';
 import '../components/thumbnail.dart';
@@ -258,8 +256,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
         ],
       ),
       onTap: () {
-        final meta = MediaMetadata.fromSongItem(item);
-        player.playSong(meta);
+        player.playSong(item);
       },
     );
   }
