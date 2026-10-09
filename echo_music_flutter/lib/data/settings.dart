@@ -315,4 +315,38 @@ class Settings extends ChangeNotifier {
   set aiModel(String v) => _set('aiModel', v);
   String get aiCustomEndpoint => _prefs.getString('aiCustomEndpoint') ?? 'http://localhost:20128/v1/chat/completions';
   set aiCustomEndpoint(String v) => _set('aiCustomEndpoint', v);
+
+  // Audio DSP & Equalizer
+  bool get enableEqualizer => _prefs.getBool('enableEqualizer') ?? false;
+  set enableEqualizer(bool v) => _set('enableEqualizer', v);
+
+  String get equalizerPreset => _prefs.getString('equalizerPreset') ?? 'Flat';
+  set equalizerPreset(String v) => _set('equalizerPreset', v);
+
+  double get equalizerPreamp => _prefs.getDouble('equalizerPreamp') ?? 0.0;
+  set equalizerPreamp(double v) => _set('equalizerPreamp', v);
+
+  List<double> get equalizerBands {
+    final raw = _prefs.getStringList('equalizerBands');
+    if (raw == null || raw.length != 10) {
+      return List.filled(10, 0.0);
+    }
+    return raw.map((s) => double.tryParse(s) ?? 0.0).toList();
+  }
+
+  set equalizerBands(List<double> bands) {
+    _set('equalizerBands', bands.map((b) => b.toStringAsFixed(1)).toList());
+  }
+
+  bool get enableSpatialAudio => _prefs.getBool('enableSpatialAudio') ?? false;
+  set enableSpatialAudio(bool v) => _set('enableSpatialAudio', v);
+
+  double get spatialAudioWidth => _prefs.getDouble('spatialAudioWidth') ?? 1.4;
+  set spatialAudioWidth(double v) => _set('spatialAudioWidth', v);
+
+  bool get enableBassBoost => _prefs.getBool('enableBassBoost') ?? false;
+  set enableBassBoost(bool v) => _set('enableBassBoost', v);
+
+  double get bassBoostGain => _prefs.getDouble('bassBoostGain') ?? 5.0;
+  set bassBoostGain(double v) => _set('bassBoostGain', v);
 }

@@ -78,7 +78,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
             children: [
               // LEFT SECTION: Artwork, Title, Artist, Like
               SizedBox(
-                width: 280,
+                width: 310,
                 child: Row(
                   children: [
                     InkWell(
@@ -337,7 +337,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
 
               // RIGHT SECTION: Lyrics, Queue, Volume, Fullscreen
               SizedBox(
-                width: 280,
+                width: 310,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -354,6 +354,16 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                       onPressed: widget.onToggleLyrics,
                     ),
 
+                    // Equalizer & DSP button
+                    IconButton(
+                      icon: Icon(
+                        Icons.tune_rounded,
+                        size: 20,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                      tooltip: 'Equalizer & DSP',
+                      onPressed: AppNavigator.openEqualizer,
+                    ),
                     // Queue side toggle
                     IconButton(
                       icon: Icon(

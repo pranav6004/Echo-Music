@@ -1,3 +1,4 @@
+import '../screens/equalizer_screen.dart';
 import 'ai_settings_screen.dart';
 import '../screens/spotify_import_screen.dart';
 import 'dart:convert';
@@ -471,6 +472,16 @@ class PlayerSettings extends StatelessWidget {
       groups: [
         _Group(
           children: [
+            _Row(
+              icon: Icons.tune_rounded,
+              title: 'Equalizer & Audio DSP',
+              subtitle: s.enableEqualizer
+                  ? 'Enabled (${s.equalizerPreset})'
+                  : 'Off',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const EqualizerScreen()),
+              ),
+            ),
             _Row(
               icon: Icons.graphic_eq_rounded,
               title: 'Audio quality',

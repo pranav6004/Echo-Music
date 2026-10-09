@@ -13,6 +13,7 @@ import '../screens/local_playlist_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/online_playlist_screen.dart';
 import '../screens/ai_hub_screen.dart';
+import '../screens/equalizer_screen.dart';
 import '../screens/spotify_import_screen.dart';
 import '../screens/search_screen.dart';
 import '../settings/settings_screen.dart';
@@ -91,6 +92,7 @@ class AppNavigator {
   static void openMoodsAndGenres() => push(const MoodsAndGenresScreen());
   static void openSpotifyImporter() => push(const SpotifyImportScreen());
   static void openAiHub() => push(const AiHubScreen());
+  static void openEqualizer() => push(const EqualizerScreen());
 
 
   static void openHistory() => push(const HistoryScreen());
