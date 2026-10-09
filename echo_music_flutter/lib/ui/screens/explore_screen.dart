@@ -9,6 +9,10 @@ import '../components/common.dart';
 import '../components/items.dart';
 import '../shell/app_navigator.dart';
 import 'home_screen.dart';
+import 'charts_screen.dart';
+import 'moods_genres_screen.dart';
+import 'new_releases_screen.dart';
+
 
 /// Explore — new releases, moods & genres, and charts (port of
 /// `ExploreScreen.kt` + `ChartsScreen.kt`).
@@ -113,6 +117,41 @@ class _ExploreScreenState extends State<ExploreScreen>
                 ),
               ),
             ),
+
+            // Quick Discovery Hubs
+            SliverToBoxAdapter(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    _DiscoveryHubCard(
+                      icon: Icons.leaderboard_rounded,
+                      title: 'Top Charts',
+                      subtitle: 'Global & trending hits',
+                      colors: const [Color(0xFF4A00E0), Color(0xFF8E2DE2)],
+                      onTap: AppNavigator.openCharts,
+                    ),
+                    const SizedBox(width: 12),
+                    _DiscoveryHubCard(
+                      icon: Icons.album_rounded,
+                      title: 'New Releases',
+                      subtitle: 'Fresh albums & drops',
+                      colors: const [Color(0xFF0083B0), Color(0xFF00B4DB)],
+                      onTap: AppNavigator.openNewReleases,
+                    ),
+                    const SizedBox(width: 12),
+                    _DiscoveryHubCard(
+                      icon: Icons.grid_view_rounded,
+                      title: 'Moods & Genres',
+                      subtitle: 'Curated vibes',
+                      colors: const [Color(0xFFDD2476), Color(0xFFFF512F)],
+                      onTap: AppNavigator.openMoodsAndGenres,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             if (_loading)
               const SliverToBoxAdapter(
                 child: Column(children: [GridShimmer(), ListShimmer(count: 5)]),
@@ -130,7 +169,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                     items: _explore!.newReleaseAlbums.filterExplicit(
                       settings.hideExplicit,
                     ),
-                    onMore: () => AppNavigator.push(const NewReleasesScreen()),
+                    onMore: AppNavigator.openNewReleases,
                   ),
                 ),
               if (_explore != null && _explore!.moodAndGenres.isNotEmpty)
@@ -140,7 +179,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                     children: [
                       NavigationTitle(
                         title: 'Moods & genres',
-                        onTap: () => AppNavigator.push(const MoodsScreen()),
+                        onTap: AppNavigator.openMoodsAndGenres,
                       ),
                       SizedBox(
                         height: 140,
@@ -250,83 +289,70 @@ class _ChartColumns extends StatelessWidget {
   }
 }
 
-class NewReleasesScreen extends StatelessWidget {
-  const NewReleasesScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('New release albums')),
-      body: FutureBuilder<List<AlbumItem>>(
-        future: YouTube.instance.newReleaseAlbums(),
-        builder: (context, snap) {
-          if (snap.hasError) return ErrorPlaceholder(message: '${snap.error}');
-          if (!snap.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final items = snap.data!.filterExplicit(
-            Settings.instance.hideExplicit,
-          );
-          return ItemGrid(items: items);
-        },
-      ),
-    );
-  }
-}
-
-class MoodsScreen extends StatelessWidget {
-  const MoodsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Moods & genres')),
-      body: FutureBuilder<List<MoodAndGenres>>(
-        future: YouTube.instance.moodAndGenres(),
-        builder: (context, snap) {
-          if (snap.hasError) return ErrorPlaceholder(message: '${snap.error}');
-          if (!snap.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final groups = snap.data!;
-          return ListView.builder(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.paddingOf(context).bottom + 16,
-            ),
-            itemCount: groups.length,
-            itemBuilder: (context, i) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                NavigationTitle(title: groups[i].title),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          childAspectRatio: 170 / 62,
-                        ),
-                    itemCount: groups[i].items.length,
-                    itemBuilder: (context, j) => MoodChip(
-                      item: groups[i].items[j],
-                      width: double.infinity,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
 /// 2-column grid of any items with bottom padding for the floating bars.
+
+class _DiscoveryHubCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final List<Color> colors;
+  final VoidCallback onTap;
+
+  const _DiscoveryHubCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.colors,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Ink(
+          width: 180,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: colors,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: Colors.white, size: 28),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class ItemGrid extends StatelessWidget {
   final List<YTItem> items;
   final ScrollController? controller;

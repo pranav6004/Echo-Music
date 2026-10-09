@@ -134,6 +134,57 @@ class DesktopSidebar extends StatelessWidget {
 
           const SizedBox(height: 12),
 
+          // Discover Section Heading
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 4, 20, 8),
+            child: Text(
+              'DISCOVER',
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2,
+                color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Column(
+              children: [
+                _SidebarShortcutTile(
+                  icon: Icons.leaderboard_rounded,
+                  iconColor: Colors.indigoAccent,
+                  label: 'Top Charts',
+                  onTap: AppNavigator.openCharts,
+                ),
+                _SidebarShortcutTile(
+                  icon: Icons.album_rounded,
+                  iconColor: Colors.tealAccent,
+                  label: 'New Releases',
+                  onTap: AppNavigator.openNewReleases,
+                ),
+                _SidebarShortcutTile(
+                  icon: Icons.grid_view_rounded,
+                  iconColor: Colors.deepOrangeAccent,
+                  label: 'Moods & Genres',
+                  onTap: AppNavigator.openMoodsAndGenres,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Divider(
+              color: scheme.outlineVariant.withValues(alpha: 0.15),
+              height: 1,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
           // Library & Shortcuts Heading
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 4, 20, 8),

@@ -4,6 +4,9 @@ import '../../innertube/models/yt_item.dart';
 import '../screens/album_screen.dart';
 import '../screens/artist_items_screen.dart';
 import '../screens/artist_screen.dart';
+import '../screens/charts_screen.dart';
+import '../screens/moods_genres_screen.dart';
+import '../screens/new_releases_screen.dart';
 import '../screens/browse_screen.dart';
 import '../screens/history_screen.dart';
 import '../screens/local_playlist_screen.dart';
@@ -81,6 +84,9 @@ class AppNavigator {
       push(const LocalPlaylistScreen(playlistId: LocalPlaylistScreen.topId));
   static void openBrowse(BrowseEndpoint endpoint, {String? title}) =>
       push(BrowseScreen(endpoint: endpoint, title: title));
+  static void openCharts() => push(const ChartsScreen());
+  static void openNewReleases() => push(const NewReleasesScreen());
+  static void openMoodsAndGenres() => push(const MoodsAndGenresScreen());
   static void openHistory() => push(const HistoryScreen());
   static void openSearch({String? query}) =>
       push(SearchScreen(initialQuery: query));

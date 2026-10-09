@@ -277,4 +277,10 @@ class Settings extends ChangeNotifier {
     final clean = name.trim().toLowerCase();
     return blockedArtists.any((b) => b.trim().toLowerCase() == clean);
   }
+
+  bool get enablePaxsenix => _prefs.getBool('enablePaxsenix') ?? true;
+  set enablePaxsenix(bool v) => _set('enablePaxsenix', v);
+
+  bool get enableYouLyPlus => _prefs.getBool('enableYouLyPlus') ?? true;
+  set enableYouLyPlus(bool v) => _set('enableYouLyPlus', v);
 }

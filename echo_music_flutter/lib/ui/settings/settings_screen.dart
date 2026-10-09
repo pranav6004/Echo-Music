@@ -552,6 +552,20 @@ class PlayerSettings extends StatelessWidget {
               onChanged: (v) => s.enableBetterLyrics = v,
             ),
             _Switch(
+              icon: Icons.apple_rounded,
+              title: 'Paxsenix',
+              subtitle: 'Apple Music synced lyrics engine',
+              value: s.enablePaxsenix,
+              onChanged: (v) => s.enablePaxsenix = v,
+            ),
+            _Switch(
+              icon: Icons.lyrics_rounded,
+              title: 'YouLyPlus',
+              subtitle: 'Multi-mirror community lyrics',
+              value: s.enableYouLyPlus,
+              onChanged: (v) => s.enableYouLyPlus = v,
+            ),
+            _Switch(
               icon: Icons.library_music_outlined,
               title: 'LRCLIB',
               value: s.enableLrcLib,

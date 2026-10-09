@@ -1,3 +1,5 @@
+import 'providers/paxsenix.dart';
+import 'providers/youlyplus.dart';
 import 'dart:async';
 
 import '../data/database.dart';
@@ -59,6 +61,29 @@ class LyricsHelper {
       list.add((
         'KuGou',
         (m) => KuGouProvider.instance.getLyrics(
+          m.title,
+          m.artistsText,
+          m.duration,
+          album: m.album?.name,
+        ),
+      ));
+    }
+
+    if (s.enablePaxsenix) {
+      list.add((
+        'Paxsenix',
+        (m) => PaxsenixProvider.instance.getLyrics(
+          m.title,
+          m.artistsText,
+          m.duration,
+          album: m.album?.name,
+        ),
+      ));
+    }
+    if (s.enableYouLyPlus) {
+      list.add((
+        'YouLyPlus',
+        (m) => YouLyPlusProvider.instance.getLyrics(
           m.title,
           m.artistsText,
           m.duration,
