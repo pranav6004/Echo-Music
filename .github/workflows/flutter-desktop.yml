@@ -42,7 +42,7 @@ jobs:
         cache: true
 
     - name: Run Unit Tests
-      run: flutter test test/dsp_service_test.dart test/models_and_favorites_test.dart test/charts_and_locale_test.dart
+      run: flutter test test/dsp_service_test.dart test/models_and_favorites_test.dart test/charts_and_locale_test.dart test/lyrics_and_queue_test.dart
 
     - name: Build
       run: flutter build windows --release
@@ -76,7 +76,7 @@ jobs:
         cache: true
 
     - name: Run Unit Tests
-      run: flutter test test/dsp_service_test.dart test/models_and_favorites_test.dart test/charts_and_locale_test.dart
+      run: flutter test test/dsp_service_test.dart test/models_and_favorites_test.dart test/charts_and_locale_test.dart test/lyrics_and_queue_test.dart
 
     - name: Build
       run: flutter build linux --release

@@ -73,9 +73,13 @@ void main() {
     test('responsiveGridColumns calculates stable column counts for responsive widths', () {
       expect(responsiveGridColumns(300), equals(2));
       expect(responsiveGridColumns(500), equals(2));
-      expect(responsiveGridColumns(800), equals(3));
-      expect(responsiveGridColumns(1100), equals(4));
-      expect(responsiveGridColumns(1400), equals(5));
+      expect(responsiveGridColumns(600), equals(3));
+      expect(responsiveGridColumns(750), equals(3));
+      expect(responsiveGridColumns(800), equals(4));
+      expect(responsiveGridColumns(1000), equals(4));
+      expect(responsiveGridColumns(1100), equals(5));
+      expect(responsiveGridColumns(1300), equals(5));
+      expect(responsiveGridColumns(1400), equals(6));
       expect(responsiveGridColumns(1800), equals(6));
     });
   });
