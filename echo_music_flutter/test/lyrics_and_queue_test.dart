@@ -1,3 +1,4 @@
+import 'package:echo_music/innertube/models/yt_item.dart';
 import 'package:echo_music/lyrics/lyrics_utils.dart';
 import 'package:echo_music/playback/media_metadata.dart';
 import 'package:echo_music/playback/queues.dart';
@@ -42,15 +43,42 @@ void main() {
       expect(entries.length, equals(1));
       expect(entries[0].text, equals("Rock & Roll 'n' \"Fun\""));
     });
+
+    test('findCurrentLineIndex locates active lyric line with 300ms look-ahead', () {
+      final entries = [
+        const LyricsEntry(1000, 'Line 1'),
+        const LyricsEntry(5000, 'Line 2'),
+        const LyricsEntry(10000, 'Line 3'),
+      ];
+      expect(LyricsUtils.findCurrentLineIndex(entries, 0), equals(-1));
+      expect(LyricsUtils.findCurrentLineIndex(entries, 1200), equals(0));
+      expect(LyricsUtils.findCurrentLineIndex(entries, 4800), equals(1));
+      expect(LyricsUtils.findCurrentLineIndex(entries, 12000), equals(2));
+    });
+  });
+
+  group('MetadataCleaner Title & Artist Normalization', () {
+    test('cleanTitle strips noise brackets, visualizer tags, and feature strings', () {
+      expect(MetadataCleaner.cleanTitle('Shape of You (Official Music Video)'), equals('Shape of You'));
+      expect(MetadataCleaner.cleanTitle('Blinding Lights [Lyrics]'), equals('Blinding Lights'));
+      expect(MetadataCleaner.cleanTitle('Despacito feat. Daddy Yankee'), equals('Despacito'));
+      expect(MetadataCleaner.cleanTitle('Plain Track Title'), equals('Plain Track Title'));
+    });
+
+    test('cleanArtist and primaryArtist strip topic suffix and split collaborations', () {
+      expect(MetadataCleaner.cleanArtist('The Beatles - Topic'), equals('The Beatles'));
+      expect(MetadataCleaner.primaryArtist('Dua Lipa, Elton John'), equals('Dua Lipa'));
+      expect(MetadataCleaner.primaryArtist('Calvin Harris feat. Rihanna'), equals('Calvin Harris'));
+    });
   });
 
   group('QueueStatus Index Re-pointing & Filtering', () {
     test('filtered maintains current item index when preceding items are removed', () {
       final items = [
-        const MediaMetadata(id: '1', title: 'Song 1'),
-        const MediaMetadata(id: '2', title: 'Song 2'),
-        const MediaMetadata(id: '3', title: 'Song 3 (Current)'),
-        const MediaMetadata(id: '4', title: 'Song 4'),
+        const MediaMetadata(id: '1', title: 'Song 1', artists: [Artist(id: 'a1', name: 'Artist 1')]),
+        const MediaMetadata(id: '2', title: 'Song 2', artists: [Artist(id: 'a2', name: 'Artist 2')]),
+        const MediaMetadata(id: '3', title: 'Song 3 (Current)', artists: [Artist(id: 'a3', name: 'Artist 3')]),
+        const MediaMetadata(id: '4', title: 'Song 4', artists: [Artist(id: 'a4', name: 'Artist 4')]),
       ];
 
       final queue = QueueStatus(
@@ -67,7 +95,7 @@ void main() {
 
     test('filtered gracefully clamps index when all items are filtered out', () {
       final items = [
-        const MediaMetadata(id: '1', title: 'Song 1'),
+        const MediaMetadata(id: '1', title: 'Song 1', artists: [Artist(id: 'a1', name: 'Artist 1')]),
       ];
 
       final queue = QueueStatus(
