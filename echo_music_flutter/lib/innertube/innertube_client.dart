@@ -58,7 +58,9 @@ class InnerTubeClient {
   Map<String, String> _ytHeaders(
     YouTubeClient client, {
     bool setLogin = false,
+    YouTubeLocale? customLocale,
   }) {
+    final loc = customLocale ?? locale;
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'X-Goog-Api-Format-Version': '1',

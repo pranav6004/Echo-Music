@@ -1,3 +1,6 @@
+import 'dart:ui';
+import '../../innertube/youtube.dart';
+import '../../innertube/youtube_client.dart';
 import '../../services/dsp_service.dart';
 import '../../services/log_service.dart';
 import '../screens/equalizer_screen.dart';
