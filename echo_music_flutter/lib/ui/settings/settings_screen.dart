@@ -13,7 +13,6 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'blocked_artists_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/utils.dart';
 import '../../data/database.dart';
@@ -23,9 +22,18 @@ import '../../stream/stream_resolver.dart';
 import '../components/common.dart';
 import '../screens/account_screen.dart';
 
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 /// Settings hub (port of `SettingsScreen.kt`) with grouped iOS-style cards.
+Future<void> _launchExternalUrl(String url) async {
+  if (Platform.isWindows) {
+    await Process.run('explorer.exe', [url]);
+  } else if (Platform.isMacOS) {
+    await Process.run('open', [url]);
+  } else {
+    await Process.run('xdg-open', [url]);
+  }
+}
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -582,7 +590,7 @@ class PlayerSettings extends StatelessWidget {
               _Switch(
                 icon: Icons.speaker_group_rounded,
                 title: 'WASAPI Exclusive Mode',
-                subtitle: 'Bit-perfect direct hardware output to DAC (bypasses Windows mixer)',
+                subtitle: 'Bit-perfect direct hardware output to DAC (bypasses Windows mixer & per-app volume sliders)',
                 value: s.wasapiExclusive,
                 onChanged: (v) => DspService.instance.setWasapiExclusive(v),
               ),
@@ -1097,7 +1105,8 @@ class _StorageSettingsState extends State<StorageSettings> {
               subtitle: 'Album art and thumbnails',
               trailing: TextButton(
                 onPressed: () async {
-                  await DefaultCacheManager().emptyCache();
+                  PaintingBinding.instance.imageCache.clear();
+                  PaintingBinding.instance.imageCache.clearLiveImages();
                   if (context.mounted) {
                     showSnack(context, 'Image cache cleared');
                   }
@@ -1190,19 +1199,13 @@ class AboutScreen extends StatelessWidget {
                 icon: Icons.code_rounded,
                 title: 'Source code',
                 subtitle: 'github.com/pranav6004/Echo-Music',
-                onTap: () => launchUrl(
-                  Uri.parse('https://github.com/pranav6004/Echo-Music'),
-                  mode: LaunchMode.externalApplication,
-                ),
+                onTap: () => _launchExternalUrl('https://github.com/pranav6004/Echo-Music'),
               ),
               _Row(
                 icon: Icons.discord,
                 title: 'Discord',
                 subtitle: 'Join the community',
-                onTap: () => launchUrl(
-                  Uri.parse('https://discord.gg/Xt5hgsJJuA'),
-                  mode: LaunchMode.externalApplication,
-                ),
+                onTap: () => _launchExternalUrl('https://discord.gg/Xt5hgsJJuA'),
               ),
               _Row(
                 icon: Icons.policy_outlined,

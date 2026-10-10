@@ -82,6 +82,13 @@ class AiService {
           if (host.startsWith('169.254.') || host == 'metadata.google.internal') {
             throw ArgumentError('Custom AI endpoint pointing to cloud metadata service is prohibited');
           }
+          final isLocal = host == 'localhost' || host == '127.0.0.1' || host == '::1';
+          if (!isLocal && uri.scheme != 'https') {
+            throw ArgumentError('Non-local custom AI endpoints must use HTTPS to prevent credential leakage');
+          }
+          if (!isLocal && (host.startsWith('10.') || host.startsWith('192.168.') || RegExp(r'^172\.(1[6-9]|2[0-9]|3[0-1])\.').hasMatch(host))) {
+            throw ArgumentError('Connecting to private RFC1918 subnets via custom AI endpoint is prohibited');
+          }
         }
         return ep;
     }

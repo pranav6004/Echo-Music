@@ -44,17 +44,13 @@ dependencies:
   cached_network_image: ^4.0.4
   flutter_inappwebview: ^6.1.5
   palette_generator: ^0.3.3+7
-  shimmer: ^4.0.0
   xml: ^6.6.1
   scrollable_positioned_list: ^0.3.8
-  url_launcher: ^6.3.3
-  flutter_cache_manager: ^3.4.5
   just_audio_media_kit: ^2.1.0
   media_kit: ^1.1.11
   just_audio_platform_interface: ^4.6.0
   media_kit_libs_linux: ^1.2.1
   media_kit_libs_windows_audio: ^1.0.9
-  audio_service_mpris: ^0.2.1
   sqflite_common_ffi: ^2.4.3
 dev_dependencies:
   flutter_test:

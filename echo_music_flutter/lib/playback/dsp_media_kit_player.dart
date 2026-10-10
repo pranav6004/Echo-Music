@@ -78,10 +78,8 @@ class ResonaMediaKitPlayer extends AudioPlayerPlatform {
       np.setProperty('gapless-audio', 'weak');
       np.setProperty('audio-stream-silence', 'yes');
       np.setProperty('audio-wait-open', '0.2');
-      if (Settings.instance.wasapiExclusive) {
-        np.setProperty('ao', 'wasapi');
-        np.setProperty('audio-exclusive', 'yes');
-      }
+      np.setProperty('ao', 'wasapi');
+      np.setProperty('audio-exclusive', Settings.instance.wasapiExclusive ? 'yes' : 'no');
     }
 
     _streamSubscriptions = [
