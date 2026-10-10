@@ -135,6 +135,19 @@ class EchoMediaKitPlayer extends AudioPlayerPlatform {
         }
       }),
       _player.stream.error.listen((error) {
+        // Non-fatal DSP filter initialization warning/error:
+        // libmpv continues playing the underlying audio stream without filters.
+        // Prevent completing _loadCompleter with error and triggering YouTube rate-limit retries.
+        if (error.contains('Audio filter') || error.contains('filter')) {
+          debugPrint('Non-fatal mpv audio filter error: $error');
+          if (_player.platform is NativePlayer) {
+            try {
+              (_player.platform as NativePlayer).setProperty('af', '');
+            } catch (_) {}
+          }
+          return;
+        }
+
         _processingState = ProcessingStateMessage.idle;
         _errorCode = 1;
         _errorMessage = error;

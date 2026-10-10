@@ -48,7 +48,7 @@ class _EchoAppState extends State<EchoApp> {
           DarkModePref.off => ThemeMode.light,
         };
         return MaterialApp(
-          title: 'Echo Music',
+          title: 'Resona',
           debugShowCheckedModeBanner: false,
           scrollBehavior: const EchoScrollBehavior(),
           navigatorKey: AppNavigator.rootKey,

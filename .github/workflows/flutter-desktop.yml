@@ -46,7 +46,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: EchoMusic-windows-x64
+        name: Resona-windows-x64
         path: echo_music_flutter/build/windows/x64/runner/Release/
 
   linux:
@@ -76,9 +76,9 @@ jobs:
       run: flutter build linux --release
 
     - name: Package
-      run: tar -czf echo-music-linux-x64.tar.gz -C build/linux/x64/release/bundle .
+      run: tar -czf resona-linux-x64.tar.gz -C build/linux/x64/release/bundle .
 
     - uses: actions/upload-artifact@v4
       with:
-        name: echo-music-linux-x64
-        path: echo_music_flutter/echo-music-linux-x64.tar.gz
+        name: resona-linux-x64
+        path: echo_music_flutter/resona-linux-x64.tar.gz

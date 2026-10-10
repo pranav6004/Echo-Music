@@ -64,18 +64,22 @@ class DesktopSidebar extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.graphic_eq_rounded,
-                      color: Colors.white,
-                      size: 20,
+                  child: Center(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: Image.asset(
+                        'assets/icon/app_icon.png',
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Echo Music',
+                    'Resona',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.3,

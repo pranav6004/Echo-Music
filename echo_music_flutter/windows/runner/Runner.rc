@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Echo Music" "\0"
-            VALUE "FileDescription", "Echo Music" "\0"
+            VALUE "CompanyName", "Resona" "\0"
+            VALUE "FileDescription", "Resona Music Player" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "EchoMusic" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 Echo Music. All rights reserved." "\0"
-            VALUE "OriginalFilename", "EchoMusic.exe" "\0"
-            VALUE "ProductName", "Echo Music" "\0"
+            VALUE "InternalName", "Resona" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Resona Maintainers / Pranav. All rights reserved." "\0"
+            VALUE "OriginalFilename", "Resona.exe" "\0"
+            VALUE "ProductName", "Resona" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

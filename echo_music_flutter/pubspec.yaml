@@ -1,5 +1,5 @@
 name: echo_music
-description: "Echo Music - ad-free YouTube Music streaming with synced lyrics and offline playback."
+description: "Resona - Modern high-performance desktop music client with lossless DSP, synchronized lyrics, and offline playback."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

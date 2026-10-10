@@ -72,7 +72,7 @@ Future<void> main() async {
       builder: () => EchoAudioHandler(),
       config: const AudioServiceConfig(
         androidNotificationChannelId: 'echo.music.channel.audio',
-        androidNotificationChannelName: 'Echo Music',
+        androidNotificationChannelName: 'Resona',
         androidNotificationOngoing: true,
         androidStopForegroundOnPause: true,
       ),

@@ -99,7 +99,7 @@ class DspService extends ChangeNotifier {
     if (player == null) return;
     final s = Settings.instance;
 
-    final filters = <String>[];
+    final subFilters = <String>[];
 
     // 1. Preamp & Equalizer (10 ISO Bands biquad peaking)
     if (s.enableEqualizer) {
@@ -107,29 +107,31 @@ class DspService extends ChangeNotifier {
         final p = s.equalizerPreamp > 0
             ? '+${s.equalizerPreamp.toStringAsFixed(1)}'
             : s.equalizerPreamp.toStringAsFixed(1);
-        filters.add('lavfi=[volume=volume=${p}dB]');
+        subFilters.add('volume=volume=${p}dB');
       }
       const freqs = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
       final bands = s.equalizerBands;
       for (var i = 0; i < 10 && i < bands.length; i++) {
         final gain = bands[i];
         if (gain.abs() > 0.05) {
-          filters.add('lavfi=[equalizer=f=${freqs[i]}:width_type=o:width=1.0:g=${gain.toStringAsFixed(1)}]');
+          subFilters.add('equalizer=f=${freqs[i]}:width_type=o:width=1.0:g=${gain.toStringAsFixed(1)}');
         }
       }
     }
 
     // 2. Bass Boost (lowshelf filter)
     if (s.enableBassBoost && s.bassBoostGain > 0) {
-      filters.add('lavfi=[bass=g=${s.bassBoostGain.toStringAsFixed(1)}:f=100]');
+      subFilters.add('bass=g=${s.bassBoostGain.toStringAsFixed(1)}:f=100');
     }
 
-    // 3. Spatial Audio / Stereo Widener (Mid-Side widening via stereotools)
+    // 3. Spatial Audio / Stereo Widener (Mid-Side widening with stereo format guarantee)
     if (s.enableSpatialAudio && s.spatialAudioWidth > 1.0) {
-      filters.add('lavfi=[stereotools=slev=${s.spatialAudioWidth.toStringAsFixed(2)}]');
+      subFilters.add('aformat=channel_layouts=stereo');
+      subFilters.add('stereotools=mode=lr>lr:slev=${s.spatialAudioWidth.toStringAsFixed(2)}:mlev=1.0');
     }
 
-    final afString = filters.join(',');
+    // Unify all filters into a single libavfilter graph to prevent inter-filter bridge failures
+    final afString = subFilters.isEmpty ? '' : 'lavfi=[${subFilters.join(',')}]';
     try {
       if (player.platform is NativePlayer) {
         await (player.platform as NativePlayer).setProperty('af', afString);
