@@ -305,25 +305,7 @@ class ResonaMediaKitPlayer extends AudioPlayerPlatform {
     return PauseResponse();
   }
 
-  @override
-  Future<StopResponse> stop(StopRequest request) async {
-    _playing = false;
-    if (_mediaOpened) {
-      try {
-        await _player.pause();
-        await _player.stop();
-        if (Platform.isWindows && _player.platform is NativePlayer) {
-          final np = _player.platform as NativePlayer;
-          np.setProperty('pause', 'yes');
-        }
-      } catch (e) {
-        debugPrint('[player] stop error: $e');
-      }
-    }
-    _processingState = ProcessingStateMessage.idle;
-    _updatePlaybackEvent();
-    return StopResponse();
-  }
+
 
   @override
   Future<SetVolumeResponse> setVolume(SetVolumeRequest request) {

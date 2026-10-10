@@ -80,7 +80,12 @@ class QueueBody extends StatelessWidget {
                           confirm: 'Clear',
                         )) {
                           await handler.clearQueue();
-                          if (context.mounted) Navigator.of(context).pop();
+                          if (context.mounted) {
+                            final route = ModalRoute.of(context);
+                            if (route != null && !route.isFirst && route is PopupRoute) {
+                              Navigator.of(context).pop();
+                            }
+                          }
                         }
                       },
                       icon: const Icon(Icons.clear_all_rounded),
@@ -90,7 +95,16 @@ class QueueBody extends StatelessWidget {
               ),
               const Divider(),
               Expanded(
-                child: ReorderableListView.builder(
+                child: items.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Queue is empty',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      )
+                    : ReorderableListView.builder(
                   itemCount: items.length,
                   buildDefaultDragHandles: false,
                   // onReorderItem already accounts for the removed item.
@@ -123,7 +137,7 @@ class QueueBody extends StatelessWidget {
                           isPlaying: i == index && playing,
                           explicit: m.explicit,
                           onTap: () => handler.skipToQueueItem(i),
-                          onMore: () => showSongMenu(context, m.toSongItem()),
+                          onMore: () => showSongMenu(context, m.toSongItem(), queueIndex: i),
                           trailing: ReorderableDragStartListener(
                             index: i,
                             child: const Padding(

@@ -153,6 +153,7 @@ Future<void> showSongMenu(
   Song? local,
   String? playlistId,
   int? eventId,
+  int? queueIndex,
 }) async {
   final db = AppDatabase.instance;
   final meta = local?.toMediaMetadata() ?? MediaMetadata.fromSongItem(song);
@@ -173,6 +174,17 @@ Future<void> showSongMenu(
       'Add to queue',
       () => player.addToQueue([meta]),
     ),
+    if (queueIndex != null)
+      _MenuAction(
+        Icons.remove_from_queue_rounded,
+        'Remove from queue',
+        () async {
+          await player.handler.removeFromQueue(queueIndex);
+          if (context.mounted) {
+            showSnack(context, 'Removed from queue');
+          }
+        },
+      ),
     if (!meta.isLocal)
       _MenuAction(
         Icons.radio_rounded,
