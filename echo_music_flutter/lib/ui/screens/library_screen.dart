@@ -548,27 +548,90 @@ class _ArtistsSliver extends StatelessWidget {
           );
         }
         return SliverPadding(
-          padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
-          sliver: SliverList.builder(
-            itemCount: artists.length,
-            itemBuilder: (context, i) {
-              final a = artists[i];
-              final item = ArtistItem(
-                id: a.artist.id,
-                title: a.artist.name,
-                thumbnail: a.artist.thumbnailUrl,
-                channelId: a.artist.channelId,
-              );
-              return MediaListTile(
-                title: a.artist.name,
-                subtitle: joinByBullet([
-                  if (a.artist.bookmarkedAt != null) 'Subscribed',
-                  if (a.songCount > 0) '${a.songCount} songs',
-                ]),
-                thumbnailUrl: a.artist.thumbnailUrl,
-                circle: true,
-                onTap: () => AppNavigator.openArtist(a.artist.id),
-                onMore: () => showArtistMenu(context, item),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          sliver: SliverLayoutBuilder(
+            builder: (context, constraints) {
+              final availableW = constraints.crossAxisExtent;
+              final cols = responsiveGridColumns(availableW);
+              if (availableW >= 600) {
+                final width = (availableW - (cols - 1) * 16) / cols;
+                return SliverGrid.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: cols,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: width / (width + 52),
+                  ),
+                  itemCount: artists.length,
+                  itemBuilder: (context, i) {
+                    final a = artists[i];
+                    final item = ArtistItem(
+                      id: a.artist.id,
+                      title: a.artist.name,
+                      thumbnail: a.artist.thumbnailUrl,
+                      channelId: a.artist.channelId,
+                    );
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => AppNavigator.openArtist(a.artist.id),
+                      onLongPress: () => showArtistMenu(context, item),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ClipOval(
+                            child: EchoImage(
+                              url: a.artist.thumbnailUrl,
+                              width: width * 0.82,
+                              height: width * 0.82,
+                              circle: true,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            a.artist.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            a.songCount > 0 ? '${a.songCount} songs' : 'Artist',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }
+              return SliverList.builder(
+                itemCount: artists.length,
+                itemBuilder: (context, i) {
+                  final a = artists[i];
+                  final item = ArtistItem(
+                    id: a.artist.id,
+                    title: a.artist.name,
+                    thumbnail: a.artist.thumbnailUrl,
+                    channelId: a.artist.channelId,
+                  );
+                  return MediaListTile(
+                    title: a.artist.name,
+                    subtitle: joinByBullet([
+                      if (a.artist.bookmarkedAt != null) 'Subscribed',
+                      if (a.songCount > 0) '${a.songCount} songs',
+                    ]),
+                    thumbnailUrl: a.artist.thumbnailUrl,
+                    circle: true,
+                    onTap: () => AppNavigator.openArtist(a.artist.id),
+                    onMore: () => showArtistMenu(context, item),
+                  );
+                },
               );
             },
           ),

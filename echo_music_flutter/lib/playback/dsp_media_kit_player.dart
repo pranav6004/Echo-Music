@@ -75,7 +75,7 @@ class EchoMediaKitPlayer extends AudioPlayerPlatform {
     if (Platform.isWindows && _player.platform is NativePlayer) {
       final np = _player.platform as NativePlayer;
       // Windows audio stability properties to prevent track transition muting
-      np.setProperty('gapless-audio', 'yes');
+      np.setProperty('gapless-audio', 'weak');
       np.setProperty('audio-stream-silence', 'yes');
       np.setProperty('audio-wait-open', '0.2');
       if (Settings.instance.wasapiExclusive) {
@@ -150,7 +150,9 @@ class EchoMediaKitPlayer extends AudioPlayerPlatform {
         }
       }),
       _player.stream.playing.listen((playing) {
-        _playing = playing;
+        if (_processingState != ProcessingStateMessage.completed) {
+          _playing = playing;
+        }
         _updatePlaybackEvent();
       }),
       _player.stream.volume.listen((volume) {
@@ -245,9 +247,9 @@ class EchoMediaKitPlayer extends AudioPlayerPlatform {
     _playing = true;
     if (_mediaOpened) {
       await _player.play();
-      // On Windows WASAPI, a micro-unpause kick ensures the audio sink awakens on track transition
-      if (Platform.isWindows && _position == Duration.zero) {
-        unawaited(_player.play());
+      if (Platform.isWindows && _player.platform is NativePlayer) {
+        final np = _player.platform as NativePlayer;
+        np.setProperty('pause', 'no');
       }
     }
     return PlayResponse();

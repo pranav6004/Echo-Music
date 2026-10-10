@@ -1,3 +1,4 @@
+import '../../core/utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/settings.dart';
@@ -371,25 +372,30 @@ class ItemGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = (MediaQuery.sizeOf(context).width - 48) / 2;
-    return GridView.builder(
-      controller: controller,
-      padding: EdgeInsets.fromLTRB(
-        16,
-        8,
-        16,
-        MediaQuery.paddingOf(context).bottom + 16,
-      ),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        childAspectRatio: width / (width + 52),
-      ),
-      itemCount: items.length + (footer != null ? 1 : 0),
-      itemBuilder: (context, i) {
-        if (i == items.length) return footer!;
-        return YTGridItem(item: items[i], width: width);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cols = responsiveGridColumns(constraints.maxWidth);
+        final itemWidth = (constraints.maxWidth - 32 - (cols - 1) * 16) / cols;
+        return GridView.builder(
+          controller: controller,
+          padding: EdgeInsets.fromLTRB(
+            16,
+            8,
+            16,
+            MediaQuery.paddingOf(context).bottom + 16,
+          ),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: cols,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            childAspectRatio: itemWidth / (itemWidth + 56),
+          ),
+          itemCount: items.length + (footer != null ? 1 : 0),
+          itemBuilder: (context, i) {
+            if (i == items.length) return footer!;
+            return YTGridItem(item: items[i], width: itemWidth);
+          },
+        );
       },
     );
   }

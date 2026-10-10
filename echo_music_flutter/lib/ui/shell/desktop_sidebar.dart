@@ -24,8 +24,11 @@ class DesktopSidebar extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
+    final screenW = MediaQuery.sizeOf(context).width;
+    final sidebarWidth = screenW < 960 ? 200.0 : 240.0;
+
     return Container(
-      width: 240,
+      width: sidebarWidth,
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLowest,
         border: Border(

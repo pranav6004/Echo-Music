@@ -26,8 +26,11 @@ class DesktopSidePanel extends StatelessWidget {
     final scheme = theme.colorScheme;
     final isLyrics = type == DesktopPanelType.lyrics;
 
+    final screenW = MediaQuery.sizeOf(context).width;
+    final panelWidth = (screenW * 0.28).clamp(280.0, 360.0);
+
     return Container(
-      width: 360,
+      width: panelWidth,
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLowest,
         border: Border(

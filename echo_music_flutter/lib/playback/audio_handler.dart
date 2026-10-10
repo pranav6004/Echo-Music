@@ -701,7 +701,11 @@ class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
       _consecutiveErrors = 0;
       isLoadingItem.value = false;
       if (playWhenReady) {
-        unawaited(_player.play());
+        if (_player.playing) {
+          await _player.pause();
+        }
+        await _player.play();
+        _applyNormalization(currentStream.value?.loudnessDb);
       }
       _preResolveNext();
       _registerRemotePlayback(meta);

@@ -75,11 +75,16 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
             );
           }
 
+          final screenW = MediaQuery.sizeOf(context).width;
+          final isCompact = screenW < 1080;
+          final leftWidth = isCompact ? 240.0 : 310.0;
+          final rightWidth = isCompact ? 240.0 : 310.0;
+
           return Row(
             children: [
               // LEFT SECTION: Artwork, Title, Artist, Like
               SizedBox(
-                width: 310,
+                width: leftWidth,
                 child: Row(
                   children: [
                     InkWell(
@@ -372,12 +377,14 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
 
               // RIGHT SECTION: Lyrics, Queue, Volume, Fullscreen
               SizedBox(
-                width: 310,
+                width: rightWidth,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     // Lyrics side toggle
                     IconButton(
+                      padding: const EdgeInsets.all(6),
+                      constraints: const BoxConstraints(),
                       icon: Icon(
                         widget.isLyricsOpen
                             ? Icons.lyrics_rounded
@@ -391,6 +398,8 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
 
                     // Equalizer & DSP button
                     IconButton(
+                      padding: const EdgeInsets.all(6),
+                      constraints: const BoxConstraints(),
                       icon: Icon(
                         Icons.tune_rounded,
                         size: 20,
@@ -399,18 +408,23 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                       tooltip: 'Equalizer & DSP',
                       onPressed: AppNavigator.openEqualizer,
                     ),
-                    // Party Rooms button
-                    IconButton(
-                      icon: Icon(
-                        Icons.podcasts_rounded,
-                        size: 20,
-                        color: scheme.onSurfaceVariant,
+                    // Party Rooms button (only on wider screens)
+                    if (!isCompact)
+                      IconButton(
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(),
+                        icon: Icon(
+                          Icons.podcasts_rounded,
+                          size: 20,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                        tooltip: 'Party Rooms',
+                        onPressed: AppNavigator.openPartyRooms,
                       ),
-                      tooltip: 'Party Rooms',
-                      onPressed: AppNavigator.openPartyRooms,
-                    ),
                     // Queue side toggle
                     IconButton(
+                      padding: const EdgeInsets.all(6),
+                      constraints: const BoxConstraints(),
                       icon: Icon(
                         widget.isQueueOpen
                             ? Icons.queue_music_rounded
@@ -438,6 +452,8 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
+                              padding: const EdgeInsets.all(4),
+                              constraints: const BoxConstraints(),
                               icon: Icon(volIcon, size: 20, color: scheme.onSurfaceVariant),
                               tooltip: isMuted ? 'Unmute' : 'Mute',
                               onPressed: () {
@@ -450,7 +466,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                               },
                             ),
                             SizedBox(
-                              width: 80,
+                              width: isCompact ? 60 : 80,
                               child: SliderTheme(
                                 data: SliderTheme.of(context).copyWith(
                                   trackHeight: 3,
