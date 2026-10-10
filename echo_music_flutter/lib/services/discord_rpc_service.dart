@@ -15,7 +15,7 @@ class DiscordRpcService {
   DiscordRpcService._();
   static final instance = DiscordRpcService._();
 
-  static const _defaultClientId = '1518210534070292541'; // Resona default client ID
+  static const _defaultClientId = '1558422196802555934'; // Resona default client ID
 
   String get clientId {
     final custom = Settings.instance.discordClientId.trim();

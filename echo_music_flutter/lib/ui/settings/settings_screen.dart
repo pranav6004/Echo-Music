@@ -1263,7 +1263,7 @@ class _IntegrationsSettingsState extends State<IntegrationsSettings> {
                 icon: Icons.badge_outlined,
                 title: 'Discord Application ID',
                 subtitle: s.discordClientId.isEmpty
-                    ? 'Default (1518210534070292541)'
+                    ? 'Default (1558422196802555934)'
                     : s.discordClientId,
                 trailing: TextButton(
                   onPressed: () => _editDiscordClientId(context),
