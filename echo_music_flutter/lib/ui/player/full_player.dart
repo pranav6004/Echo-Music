@@ -144,9 +144,9 @@ class _FullPlayerState extends State<FullPlayer> {
                           onBg: onBg,
                           dragValue: _dragValue,
                           onDrag: (v) => setState(() => _dragValue = v),
-                          onDragEnd: (v) {
+                          onDragEnd: (dur) {
                             setState(() => _dragValue = null);
-                            handler.seek(v);
+                            handler.seek(dur);
                           },
                           showLyrics: _showLyrics,
                           showQueue: _showQueue,
@@ -598,7 +598,7 @@ class _WidescreenStage extends StatelessWidget {
                         tooltip: 'Add to playlist',
                         onBg: onBg,
                         onTap: () =>
-                            showAddToPlaylistSheet(context, meta.toSongItem()),
+                            showAddToPlaylistSheet(context, [meta]),
                       ),
                       const SizedBox(width: 10),
                       _ActionCircleButton(
@@ -791,7 +791,7 @@ class _BottomDeck extends StatelessWidget {
   final Color onBg;
   final double? dragValue;
   final ValueChanged<double> onDrag;
-  final ValueChanged<double> onDragEnd;
+  final ValueChanged<Duration> onDragEnd;
   final bool showLyrics;
   final bool showQueue;
   final bool isWidescreen;
@@ -865,44 +865,46 @@ class _BottomDeck extends StatelessWidget {
               const SizedBox(width: 14),
 
               // Play / Pause FAB
-              ValueListenableBuilder<bool>(
-                valueListenable: handler.isPlaying,
-                builder: (context, playing, _) =>
-                    ValueListenableBuilder<bool>(
-                  valueListenable: handler.isLoadingItem,
-                  builder: (context, loading, _) {
-                    return Material(
-                      color: onBg,
-                      shape: const CircleBorder(),
-                      elevation: 8,
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: () => playing ? handler.pause() : handler.play(),
-                        child: Container(
-                          width: 58,
-                          height: 58,
-                          alignment: Alignment.center,
-                          child: loading
-                              ? const SizedBox(
-                                  width: 26,
-                                  height: 26,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
+              StreamBuilder<bool>(
+                stream: handler.player.playingStream,
+                builder: (context, snap) {
+                  final playing = snap.data ?? handler.player.playing;
+                  return ValueListenableBuilder<bool>(
+                    valueListenable: handler.isLoadingItem,
+                    builder: (context, loading, _) {
+                      return Material(
+                        color: onBg,
+                        shape: const CircleBorder(),
+                        elevation: 8,
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () => playing ? handler.pause() : handler.play(),
+                          child: Container(
+                            width: 58,
+                            height: 58,
+                            alignment: Alignment.center,
+                            child: loading
+                                ? const SizedBox(
+                                    width: 26,
+                                    height: 26,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                      color: Colors.black,
+                                    ),
+                                  )
+                                : Icon(
+                                    playing
+                                        ? Icons.pause_rounded
+                                        : Icons.play_arrow_rounded,
+                                    size: 38,
                                     color: Colors.black,
                                   ),
-                                )
-                              : Icon(
-                                  playing
-                                      ? Icons.pause_rounded
-                                      : Icons.play_arrow_rounded,
-                                  size: 38,
-                                  color: Colors.black,
-                                ),
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  );
+                },
               ),
 
               const SizedBox(width: 14),
@@ -950,7 +952,7 @@ class _Seekbar extends StatelessWidget {
   final MediaMetadata meta;
   final double? dragValue;
   final ValueChanged<double> onDrag;
-  final ValueChanged<double> onDragEnd;
+  final ValueChanged<Duration> onDragEnd;
   const _Seekbar({
     required this.onBg,
     required this.meta,
