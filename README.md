@@ -1,296 +1,148 @@
-<div align="center">
-  <img src="assets/banner.png" alt="Resona Logo"/>
+# Resona
 
-  <p><b>A modern Android music app with ad-free streaming, synced lyrics, offline playback, and an intuitive user experience.</b></p>
+<div align="center">
+  <h1>Resona</h1>
+  <p><b>High-performance, privacy-first modern desktop music client with studio DSP, synchronized lyrics, AI playlist studio, and seamless streaming.</b></p>
+
+  <p>
+    <a href="https://github.com/pranav6004/resona/releases/latest"><img src="https://img.shields.io/github/v/release/pranav6004/resona?color=blue&style=flat-square" alt="Latest Release"/></a>
+    <a href="https://github.com/pranav6004/resona/actions"><img src="https://img.shields.io/github/actions/workflow/status/pranav6004/resona/flutter-desktop.yml?style=flat-square&label=build" alt="CI Status"/></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-green?style=flat-square" alt="License"/></a>
+    <a href="https://flutter.dev"><img src="https://img.shields.io/badge/built%20with-Flutter-02569B?style=flat-square" alt="Flutter"/></a>
+  </p>
 </div>
 
 ---
 
 ## Overview
 
-Resona delivers a seamless, premium listening experience by leveraging YouTube Music's vast library — without the ads. It adds powerful extras including offline downloads, real-time synchronized lyrics, and environment-aware music recognition.
+**Resona** is a standalone, native desktop music application crafted for audiophiles and music lovers on Windows and Linux. Built from the ground up for desktop environments using Flutter and the high-fidelity `libmpv` audio backend, Resona combines an ad-free streaming engine with hardware-grade DSP sound processing, multi-provider synchronized lyrics, LLM-powered playlist curation, and privacy-respecting social integrations.
 
-> [!IMPORTANT]
-> **In-app OTA updates have been permanently removed.** Please update manually via the website. Resona is completely free and ad-free; the few ads shown during a manual download help support the ongoing development of this project. Please do not open issues requesting to bring this back. Thank you for your support!
-
----
-
-- **Discord**: [Join the Resona Discord server](https://discord.gg/Xt5hgsJJuA)
+Zero advertisements. Zero trackers. Zero subscriptions.
 
 ---
 
-## Table of Contents
+## Key Features
 
-- [Overview](#overview)
-- [Screenshots](#screenshots)
-- [Features](#features)
-- [Installation & Setup](#installation--setup)
-- [Support the Project](#support-the-project)
-- [Contributors](#contributors)
-- [Special Thanks](#special-thanks)
+### 🖥️ Desktop-First Interface
+- **Responsive 3-Column Ergonomics**: Adaptive sidebar navigation, responsive content grid (2 to 6 columns), and a persistent bottom player bar.
+- **Dynamic Side Panel**: Slide-out panel for live synchronized lyrics and real-time reorderable playback queue without modal takeover.
+- **Fluid Layout**: Native dark-mode palette, custom geometric branding, mouse-drag carousel support, and full keyboard navigation.
 
----
+### 🎛️ Studio-Grade Audio DSP & Hardware Engine
+- **10-Band Graphic Equalizer**: Precision sliders covering 31 Hz to 16 kHz ISO frequency bands with real-time interactive Bezier curve visualization.
+- **Acoustic Enhancers**: Hardware-accelerated Preamp gain (-10 dB to +10 dB), Low-shelf Bass Boost Enhancer (100 Hz), and Spatial Audio stereo width expander.
+- **Acoustic Presets**: Instant switching across Flat, Bass Boost, Rock, Pop, Electronic, Vocal, Acoustic, Jazz, Classical, and custom profiles.
+- **WASAPI Exclusive Mode (Windows)**: Direct bit-perfect audio streaming to external DACs bypassing the Windows OS audio engine, sample-rate converters, and system limiters.
 
-## Screenshots
+### 🎵 High-Performance Streaming & Playback
+- **Ad-Free Streaming**: Instant access to millions of tracks, albums, artists, and playlists without interruption.
+- **Resilient Engine**: High-speed stream resolver with ranged-byte validation for fast track startup (~200ms).
+- **Gapless Transitions**: Continuous track flow with automatic audio normalization.
+- **Discovery Hubs**: Dedicated Top Charts (with global and country-specific filtering), New Releases, and Moods & Genres.
 
-<div align="left">
-  <table style="margin: 0 auto; border-collapse: collapse;">
-    <tr>
-      <td align="center" style="padding: 15px; border: none;">
-        <b>Home Screen</b><br><br>
-        <img src="Screenshots/Home.png" alt="Home Screen" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
-      </td>
-      <td align="center" style="padding: 15px; border: none;">
-        <b>Material Player</b><br><br>
-        <img src="Screenshots/Material%20you%20music%20page.png" alt="Material Player" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
-      </td>
-      <td align="center" style="padding: 15px; border: none;">
-        <b>Apple Style Player</b><br><br>
-        <img src="Screenshots/Apple%20inspired%20music%20page.png" alt="Apple Style Player" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" style="padding: 15px; border: none;">
-        <b>Synchronized Lyrics</b><br><br>
-        <img src="Screenshots/lyrics.png" alt="Synchronized Lyrics" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
-      </td>
-      <td align="center" style="padding: 15px; border: none;">
-        <b>Search & Explore</b><br><br>
-        <img src="Screenshots/search%20page.png" alt="Search & Explore" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
-      </td>
-      <td align="center" style="padding: 15px; border: none;">
-        <b>Music Library</b><br><br>
-        <img src="Screenshots/library.png" alt="Music Library" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
-      </td>
-    </tr>
-  </table>
-</div>
+### 🎤 Synchronized Lyrics
+- **Multi-Source Aggregator**: Aggregates lyrics from LRCLIB, KuGou, Paxsenix, and YouLy+.
+- **Real-Time Word Sync**: High-precision synchronized lyric highlighting and smooth scrolling.
+- **Multilingual Support**: Romanization and built-in AI translation for lyrics in foreign languages.
+
+### 🤖 AI Music Hub
+- **Multi-LLM Integration**: Connect directly to Google Gemini, Anthropic Claude, OpenAI, Groq, Mistral, OpenRouter, or local self-hosted endpoints (Ollama / vLLM / LocalAI).
+- **Prompt-to-Playlist Studio**: Generate tailored tracklists from natural language prompts, automatically resolve them to audio streams, and save directly to your library.
+- **Connection Diagnostics**: Live latency ping and endpoint validator to test custom API keys and base URLs.
+
+### 🌐 Integrations & Social
+- **Discord Rich Presence**: Privacy-first Win32 Named Pipe integration (`\\.\pipe\discord-ipc-0`). Displays active song, artist, album art, elapsed time, and status with **zero** Discord user tokens or account risk.
+- **Scrobbling**: Full integration with Last.fm and ListenBrainz.
+- **Spotify Importer**: Import public Spotify playlists and tracklists directly into your local SQLite library.
+- **Listen Together**: Low-latency WebSocket party rooms for synchronized listening with friends.
+
+### 💾 Offline Storage & Library Management
+- **Offline Downloads & Caching**: Save songs locally with an integrated download manager.
+- **Blocked Artists Filter**: Block specific artists to exclude them from auto-play, radio, and recommendations.
+- **Full JSON Backup & Restore**: One-click database export and import to preserve playlists, favorites, and listening history.
 
 ---
 
-## Features
+## Download & Installation
 
-### What's New
+### Pre-Built Binaries
 
-> - **Data Saver Mode (Beta)** — Automatically reduces data usage during playback for limited connections.
-> - **Settings Search Index** — Quickly find and navigate to any settings option instantly.
-> - **Redesigned UI** — Cleaner, faster, and more intuitive interface from the ground up.
-> - **Import & Sync from Spotify** — Bring your playlists over with ease and keep them up-to-date with one-tap Fast Sync.
-> - **Listen Together** — Sync music in real time, similar to Spotify Jam.
-> - **Podcast Support** — Listen to podcasts alongside your music library.
-> - **Local Media Support** — Play music files stored directly on your device.
-> - **Dynamic Island Support** — Enhanced playback notifications on supported Android devices.
+Pre-compiled standalone packages are available on the [Releases Page](https://github.com/pranav6004/resona/releases):
 
-<br>
-
-<details>
-<summary><b>Streaming & Playback</b></summary>
-<br>
-
-- **Ad-Free** — Stream without any interruptions.
-- **Data Saver Mode** — Reduce data consumption when streaming on cellular networks.
-- **Seamless Playback** — Switch effortlessly between audio-only and video modes.
-- **Background Playback** — Listen while using other apps or with the screen off.
-- **Offline Mode** — Download tracks, albums, and playlists via a dedicated download manager.
-- **Crossfade** — Smooth transitions between tracks.
-- **Canvas Animations** — Visual animations while playing music.
-
-</details>
-
-<details>
-<summary><b>Discovery & Resona Find</b></summary>
-<br>
-
-- **Resona Find** — Identify songs playing around you using advanced audio recognition.
-- **Resona Brain** — An intelligent, on-device engine that analyzes your listening momentum and auto-injects perfectly aligned tracks into your queue. Read more in the [Resona Brain Documentation](RESONA_BRAIN_DOCS.md).
-- **Smart Recommendations** — Personalized suggestions based on your listening history.
-- **Comprehensive Browsing** — Explore Charts, Podcasts, Moods, and Genres.
-
-</details>
-
-<details>
-<summary><b>Lyrics</b></summary>
-<br>
-
-- **Multiple Lyric Animations** — Choose from various lyric display styles.
-- **Word-by-Word Lyrics** — Precise per-word synchronization.
-- **Lyrics+** — New lyrics provider for improved accuracy and coverage.
-- **AI Translation** — Built-in Google Translate integration for lyrics in any language.
-
-</details>
-
-<details>
-<summary><b>Integrations</b></summary>
-<br>
-
-- **Music Sharing via Odesli** — Share songs as Song.link for cross-platform listening.
-- **Set as Ringtone** — Directly set any song as your device ringtone.
-
-</details>
-
-<details>
-<summary><b>Smart Playback</b></summary>
-<br>
-
-- **Pause on Mute** — Auto-pause when your device is muted.
-- **Resume on Bluetooth** — Playback resumes when headphones or earbuds reconnect.
-
-</details>
-
-<details>
-<summary><b>Customization</b></summary>
-<br>
-
-- **UI Density Scale** — Adjust interface spacing to your preference.
-- **High Refresh Rate Support** — Smoother UI and animations on supported displays.
-- **Fluid UI & Animations** — Material 3 Emphasized easing and GPU-accelerated lyrics for a silky smooth, lag-free experience.
-- **Hide Player Thumbnail** — Keep the player minimal without album art.
-- **Crop Album Art** — Adjust album art display to fit your style.
-- **Hide Video Songs** — Filter out video content from your feed.
-- **Hide YouTube Shorts** — Keep Shorts out of your music browsing.
-
-</details>
+- **Windows (x64)**: Download `Resona-v1.0.0-windows-x64.zip`, extract to any folder, and run `Resona.exe`.
+- **Linux (x64)**: Download `resona-linux-x64.tar.gz`, extract, and execute `./resona`. (Requires `libmpv2` / `libmpv-dev` installed).
 
 ---
 
-## Installation & Setup
+## Building from Source
 
-### Android Installation
+### Prerequisites
 
-Download the latest pre-compiled APK from the [Releases Page](https://github.com/ResonaMusicApp/Resona/releases/latest).
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.24+ recommended)
+- **Windows**: Visual Studio 2022 with *Desktop development with C++* workload.
+- **Linux**: `clang`, `cmake`, `ninja-build`, `pkg-config`, `libgtk-3-dev`, `liblzma-dev`, `libmpv-dev`.
 
-<details>
-<summary><b>Building from Source</b></summary>
-<br>
+### Build Steps
 
-1. **Clone the Repository**
-
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/iad1tya/Resona.git
-   cd Resona
+   git clone https://github.com/pranav6004/resona.git
+   cd resona/echo_music_flutter
    ```
 
-2. **Configure Android SDK**
-   Create a `local.properties` file:
-
+2. **Fetch dependencies**:
    ```bash
-   echo "sdk.dir=/path/to/your/android/sdk" > local.properties
+   flutter pub get
    ```
 
-   _(For detailed paths on Windows/macOS/Linux, refer to [SETUP.md](SETUP.md))_
+3. **Run in development mode**:
+   ```bash
+   # On Windows
+   flutter run -d windows
 
-3. **Firebase Configuration (Optional)**
-   Firebase is required for analytics and crash reporting. See the instructions in [SETUP.md](SETUP.md#3-configure-firebase-optional) for adding your `google-services.json`.
+   # On Linux
+   flutter run -d linux
+   ```
 
-4. **Build the Application**
-   Resona has two build variants: **FOSS** (without Google Play Services / Cast) and **GMS** (with Cast support).
+4. **Build release package**:
+   ```bash
+   # On Windows (outputs to build/windows/x64/runner/Release/)
+   flutter build windows --release
 
-   - To build the **FOSS** Universal Debug variant:
-     ```bash
-     ./gradlew assembleUniversalFossDebug
-     ```
-   - To build the **GMS** Universal Debug variant:
-     ```bash
-     ./gradlew assembleUniversalGmsDebug
-     ```
+   # On Linux (outputs to build/linux/x64/release/bundle/)
+   flutter build linux --release
+   ```
 
-   _(For optimized ARM64 builds, release builds, or other options, refer to [SETUP.md](SETUP.md))_
+### Running Tests
 
-</details>
-
----
-
-## Support the Project
-
-If Resona has been useful to you, consider supporting its development.
-
-<div align="left">
-  <table style="margin: 0 auto; border-collapse: collapse; border: none;">
-    <tr>
-      <td align="center" style="padding: 15px; border: none;">
-        <a href="https://buymeacoffee.com/iad1tya" style="text-decoration:none;"><img src="assets/bmac.png" alt="Buy Me A Coffee Logo" width="140" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/></a>
-      </td>
-      <td align="center" style="padding: 15px; border: none;">
-        <a href="https://intradeus.github.io/http-protocol-redirector/?r=upi://pay?pa=iad1tya@upi&pn=Aditya%20Yadav&am=&tn=Thank%20You" style="text-decoration:none;"><img src="assets/UPI.png" alt="UPI Logo" width="140" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/></a>
-      </td>
-      <td align="center" style="padding: 15px; border: none;">
-        <a href="https://www.patreon.com/cw/iad1tya" style="text-decoration:none;"><img src="assets/patreon3.webp" alt="Patreon Logo" width="140" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/></a>
-      </td>
-    </tr>
-  </table>
-</div>
-
-<br>
-
-<details>
-<summary><b>Cryptocurrency Options</b></summary>
-<br>
-
-| Network      | Address                                        |
-| :----------- | :--------------------------------------------- |
-| **Bitcoin**  | `bc1qcvyr7eekha8uytmffcvgzf4h7xy7shqzke35fy`   |
-| **Ethereum** | `0x51bc91022E2dCef9974D5db2A0e22d57B360e700`   |
-| **Solana**   | `9wjca3EQnEiqzqgy7N5iqS1JGXJiknMQv6zHgL96t94S` |
-
-</details>
+```bash
+cd echo_music_flutter
+flutter test
+```
 
 ---
 
-## Contributors
+## Tech Stack & Architecture
 
-Without the support of this incredible open-source community, none of this would be possible. Thank you to everyone who has contributed to Resona!
-
-<!-- readme: contributors -start -->
-<table>
-<tr><td align="center"><a href="https://github.com/iad1tya"><img src="https://avatars.githubusercontent.com/u/147871321?v=4" width="60" height="60" /></a></td><td align="center"><a href="https://github.com/pranav6004"><img src="https://avatars.githubusercontent.com/u/156088278?v=4" width="60" height="60" /></a></td><td align="center"><a href="https://github.com/Roshan-aa11"><img src="https://avatars.githubusercontent.com/u/192568043?v=4" width="60" height="60" /></a></td><td align="center"><a href="https://github.com/mdakashhossain1"><img src="https://avatars.githubusercontent.com/u/85729564?v=4" width="60" height="60" /></a></td><td align="center"><a href="https://github.com/VardhmanSurana"><img src="https://avatars.githubusercontent.com/u/100058534?v=4" width="60" height="60" /></a></td><td align="center"><a href="https://github.com/Rajendra0309"><img src="https://avatars.githubusercontent.com/u/103703747?v=4" width="60" height="60" /></a></td><td align="center"><a href="https://github.com/soumya-99"><img src="https://avatars.githubusercontent.com/u/59480692?v=4" width="60" height="60" /></a></td><td align="center"><a href="https://github.com/kaunkrishna"><img src="https://avatars.githubusercontent.com/u/270065466?v=4" width="60" height="60" /></a></td></tr>
-<tr><td align="center"><a href="https://github.com/andrewvalletta"><img src="https://avatars.githubusercontent.com/u/137303110?v=4" width="60" height="60" /></a></td><td align="center"><a href="https://github.com/Thibaultjaigu"><img src="https://avatars.githubusercontent.com/u/84420566?v=4" width="60" height="60" /></a></td></tr>
-</table>
-<!-- readme: contributors -end -->
-
+- **UI Framework**: [Flutter](https://flutter.dev) (Material 3 with custom desktop responsiveness)
+- **Audio Engine**: [libmpv](https://mpv.io) via `media_kit` / `just_audio_media_kit`
+- **Database**: SQLite via `sqflite_common_ffi`
+- **Networking**: Dart `http` & `web_socket_channel`
+- **IPC / System Interop**: Dart FFI (Win32 Named Pipes `kernel32.dll` for Discord RPC)
 
 ---
 
-## Special Thanks
+## Legal & Disclaimer
 
-Resona stands on the shoulders of several excellent open-source projects. Sincere thanks to:
+Resona is an open-source, non-commercial software project developed for personal and educational use.
 
-| Project                                                                                                                   | Description                                         |
-| :------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------- |
-| **[Metrolist](https://github.com/MetrolistGroup/Metrolist)** & **[Vivi Music](https://github.com/vivizzz007/vivi-music)** | Foundational inspiration and architecture reference |
-| **[ArchiveTune](https://github.com/koiverse/ArchiveTune)**                                                                | Material You UI inspiration                         |
-| **[Better Lyrics](https://better-lyrics.boidu.dev/)**                                                                     | Lyrics enhancement and synchronization              |
-| **[SimpMusic](https://github.com/maxrave-dev/SimpMusic)**                                                                 | Lyrics implementation reference                     |
-| **[Music Recognizer](https://github.com/aleksey-saenko/MusicRecognizer)**                                                 | Audio recognition (Resona Find)                       |
-| **[BravePipe](https://github.com/bravepipeproject/BravePipe)**                                                            | Decryption handling and backup playback engine      |
+- Resona does not host, store, or distribute any copyrighted audio, video, or media files.
+- All media streams are accessed directly from publicly available third-party endpoints.
+- All trademarks, logos, and brand names are property of their respective owners.
 
 ---
 
-## Legal Disclaimer & Terms of Use
+## License
 
-### 1. 100% Free, Open-Source & Strictly Non-Commercial
-
-Resona is a fully open-source project (FOSS) created purely for educational purposes and personal use. We do not sell this application, nor do we monetize it in any way. There are no advertisements, no premium features, no subscriptions, and no hidden fees within the app. This project has absolutely no commercial value or financial intent.
-
-### 2. A Custom Browser with Content Filtering
-
-Resona acts strictly as a specialized, third-party web browser and client. It simply parses the publicly available website content and APIs of YouTube and YouTube Music, rendering them in a custom user interface. The ad-free experience it provides is fundamentally no different from using a standard web browser (like Chrome, Firefox, or Brave) equipped with a common ad-blocking extension (such as uBlock Origin).
-
-### 3. Support Content Creators
-
-We deeply respect the hard work of artists, musicians, and content creators. We strongly encourage all users to subscribe to [YouTube Premium](https://www.youtube.com/premium). Purchasing a Premium subscription is the best way to financially support the creators you listen to and ensure the continued growth of the platform. Resona is built as a proof-of-concept for developers and enthusiasts, not to harm creators' revenues.
-
-### 4. No Hosting of Copyrighted Material
-
-We do not host, upload, distribute, or store any audio, video, or copyrighted media files on our own servers. All content accessed through this application is stored entirely on Google's/YouTube's servers and remains the property of their respective copyright owners. The app merely acts as a conduit to stream publicly accessible links.
-
-### 5. User Responsibility & Legal Contact
-
-The software is provided "AS IS", without warranty of any kind. The developers of Resona do not encourage or condone piracy. Users are solely responsible for ensuring their usage of this app complies with their local copyright laws and the Terms of Service of the platforms they access.
-
-Because we do not host any media files, we cannot process DMCA takedown requests for audio or video content. However, if you represent a copyright holder or have legal concerns regarding the open-source code itself, please contact us via email at: [hello@echomusic.fun](mailto:hello@echomusic.fun)
-
----
-
-<div align="center">
-  <p>Licensed under <a href="LICENSE">GPL-3.0</a></p>
-</div>
+This project is licensed under the **GNU General Public License v3.0** (GPL-3.0). See [LICENSE](LICENSE) for full details.
