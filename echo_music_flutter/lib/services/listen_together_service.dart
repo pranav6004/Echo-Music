@@ -40,8 +40,12 @@ class SyncedTrack {
   });
 
   factory SyncedTrack.fromJson(Map<String, dynamic> json) {
+    // Cloudflare audit: sanitize track ID to prevent path traversal or injection
+    final rawId = (json['id'] ?? '').toString();
+    final sanitizedId = rawId.replaceAll(RegExp(r'[^a-zA-Z0-9_\-]'), '');
+
     return SyncedTrack(
-      id: (json['id'] ?? '').toString(),
+      id: sanitizedId,
       title: (json['title'] ?? '').toString(),
       artist: (json['artist'] ?? '').toString(),
       thumbnail: json['thumbnail'] as String?,
@@ -66,6 +70,7 @@ class ListenTogetherService extends ChangeNotifier {
 
   static const defaultServer = 'wss://metroserverx.meowery.eu/ws';
   static const fallbackServer = 'wss://devilmi-vivi-music-listen-together.hf.space';
+  static const int _maxMessageBytes = 65536; // 64 KB message size limit
 
   WebSocket? _ws;
   Timer? _pingTimer;
@@ -81,9 +86,6 @@ class ListenTogetherService extends ChangeNotifier {
 
   String? _userId;
   String? get userId => _userId;
-
-  String? _sessionToken;
-  String? get sessionToken => _sessionToken;
 
   String _username = 'Echo Listener';
   String get username => _username;
@@ -147,7 +149,6 @@ class ListenTogetherService extends ChangeNotifier {
     _disconnect();
     _roomCode = null;
     _userId = null;
-    _sessionToken = null;
     _isHost = false;
     _members.clear();
     _currentTrack = null;
@@ -155,8 +156,17 @@ class ListenTogetherService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _connect(String url) async {
+  Future<void> _connect(String url, {bool allowFallback = true}) async {
     if (_isConnected) return;
+
+    // Cloudflare security: enforce WSS encryption unless connecting to localhost
+    final uri = Uri.tryParse(url);
+    if (uri == null || (uri.scheme != 'wss' && uri.host != '127.0.0.1' && uri.host != 'localhost')) {
+      _statusMessage = 'Security warning: Only encrypted wss:// connections allowed';
+      notifyListeners();
+      return;
+    }
+
     _isConnecting = true;
     _statusMessage = 'Connecting to server...';
     notifyListeners();
@@ -188,9 +198,9 @@ class ListenTogetherService extends ChangeNotifier {
       _statusMessage = 'Failed to connect: $e';
       notifyListeners();
 
-      // Retry once on fallback if default failed
-      if (url == defaultServer) {
-        await _connect(fallbackServer);
+      // Retry once on fallback server if initial default failed
+      if (allowFallback && url == defaultServer) {
+        await _connect(fallbackServer, allowFallback: false);
       }
     }
   }
@@ -226,8 +236,18 @@ class ListenTogetherService extends ChangeNotifier {
     }
   }
 
+  static String? _str(Map<String, dynamic>? map, String k1, [String? k2]) {
+    if (map == null) return null;
+    final val = map[k1] ?? (k2 != null ? map[k2] : null);
+    return val?.toString();
+  }
+
   void _onMessage(dynamic raw) {
     try {
+      // Cloudflare audit: guard against oversized frames causing memory exhaustion
+      if (raw is List<int> && raw.length > _maxMessageBytes) return;
+      if (raw is String && raw.length > _maxMessageBytes) return;
+
       final text = raw is String ? raw : utf8.decode(raw as List<int>);
       final map = jsonDecode(text) as Map<String, dynamic>;
       final type = map['type'] as String?;
@@ -237,9 +257,8 @@ class ListenTogetherService extends ChangeNotifier {
 
       switch (type) {
         case 'room_created':
-          _roomCode = payload?['room_code']?.toString() ?? payload?['roomCode']?.toString();
-          _userId = payload?['user_id']?.toString() ?? payload?['userId']?.toString();
-          _sessionToken = payload?['session_token']?.toString();
+          _roomCode = _str(payload, 'room_code', 'roomCode');
+          _userId = _str(payload, 'user_id', 'userId');
           _isHost = true;
           _members.clear();
           _members.add(RoomUser(userId: _userId ?? '', username: _username, isHost: true));
@@ -248,17 +267,15 @@ class ListenTogetherService extends ChangeNotifier {
           break;
 
         case 'join_request':
-          // Host auto-approves incoming participant
-          final guestId = payload?['user_id']?.toString() ?? payload?['userId']?.toString();
-          if (guestId != null && _isHost) {
+          final guestId = _str(payload, 'user_id', 'userId');
+          if (guestId != null && _isHost && _members.length < 50) {
             _send('approve_join', {'user_id': guestId});
           }
           break;
 
         case 'join_approved':
-          _roomCode = payload?['room_code']?.toString() ?? payload?['roomCode']?.toString();
-          _userId = payload?['user_id']?.toString() ?? payload?['userId']?.toString();
-          _sessionToken = payload?['session_token']?.toString();
+          _roomCode = _str(payload, 'room_code', 'roomCode');
+          _userId = _str(payload, 'user_id', 'userId');
           _isHost = false;
           _members.clear();
           final state = payload?['state'] as Map<String, dynamic>?;
@@ -280,7 +297,7 @@ class ListenTogetherService extends ChangeNotifier {
           break;
 
         case 'user_joined':
-          final uid = payload?['user_id']?.toString() ?? payload?['userId']?.toString() ?? '';
+          final uid = _str(payload, 'user_id', 'userId') ?? '';
           final uname = payload?['username']?.toString() ?? 'Guest';
           if (!_members.any((m) => m.userId == uid)) {
             _members.add(RoomUser(userId: uid, username: uname, isHost: false));
@@ -289,7 +306,7 @@ class ListenTogetherService extends ChangeNotifier {
           break;
 
         case 'user_left':
-          final uid = payload?['user_id']?.toString() ?? payload?['userId']?.toString() ?? '';
+          final uid = _str(payload, 'user_id', 'userId') ?? '';
           _members.removeWhere((m) => m.userId == uid);
           notifyListeners();
           break;
@@ -306,10 +323,10 @@ class ListenTogetherService extends ChangeNotifier {
             if (tInfo != null) {
               _currentTrack = SyncedTrack.fromJson(tInfo);
             }
-            _positionMs = pos;
+            _positionMs = pos.clamp(0, 86400000); // Max 24 hours
             _isPlaying = action == 'play';
 
-            if (_currentTrack != null && onSyncRequest != null) {
+            if (_currentTrack != null && onSyncRequest != null && _currentTrack!.id.isNotEmpty) {
               onSyncRequest!(_currentTrack!, _isPlaying, _positionMs);
             }
             notifyListeners();
@@ -317,8 +334,7 @@ class ListenTogetherService extends ChangeNotifier {
           break;
 
         case 'error':
-          final msg = payload?['message']?.toString() ?? 'Server error';
-          _statusMessage = msg;
+          _statusMessage = payload?['message']?.toString() ?? 'Server error';
           notifyListeners();
           break;
       }
