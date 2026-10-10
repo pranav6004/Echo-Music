@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:just_audio_platform_interface/just_audio_platform_interface.dart';
+import 'playback/player_controller.dart';
 
 import 'core/theme.dart';
 import 'data/settings.dart';
@@ -30,10 +32,30 @@ class ResonaApp extends StatefulWidget {
 }
 
 class _ResonaAppState extends State<ResonaApp> {
+  late final AppLifecycleListener _lifecycleListener;
+
   @override
   void initState() {
     super.initState();
     loginScreenBuilder = () => const LoginScreen();
+    _lifecycleListener = AppLifecycleListener(
+      onExitRequested: () async {
+        debugPrint('[app] Exit requested, gracefully stopping audio pipeline...');
+        try {
+          await PlayerController.instance.handler.stop();
+          await JustAudioPlatform.instance.disposeAllPlayers(DisposeAllPlayersRequest());
+        } catch (e) {
+          debugPrint('[app] Exit cleanup error: $e');
+        }
+        return AppExitResponse.exit;
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
   }
 
   @override

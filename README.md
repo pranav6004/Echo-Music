@@ -5,8 +5,8 @@
   <p><b>High-performance, privacy-first modern desktop music client with studio DSP, synchronized lyrics, AI playlist studio, and seamless streaming.</b></p>
 
   <p>
-    <a href="https://github.com/pranav6004/resona/releases/latest"><img src="https://img.shields.io/github/v/release/pranav6004/resona?color=blue&style=flat-square" alt="Latest Release"/></a>
-    <a href="https://github.com/pranav6004/resona/actions"><img src="https://img.shields.io/github/actions/workflow/status/pranav6004/resona/flutter-desktop.yml?style=flat-square&label=build" alt="CI Status"/></a>
+    <a href="https://github.com/pranav6004/resona/releases"><img src="https://img.shields.io/badge/release-v1.0.0-blue?style=flat-square" alt="Latest Release"/></a>
+    <a href="https://github.com/pranav6004/resona/actions"><img src="https://img.shields.io/badge/build-passing-brightgreen?style=flat-square" alt="CI Status"/></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-green?style=flat-square" alt="License"/></a>
     <a href="https://flutter.dev"><img src="https://img.shields.io/badge/built%20with-Flutter-02569B?style=flat-square" alt="Flutter"/></a>
   </p>

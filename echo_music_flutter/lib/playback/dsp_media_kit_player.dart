@@ -9,16 +9,31 @@ import 'package:media_kit/media_kit.dart';
 import '../services/dsp_service.dart';
 
 class ResonaMediaKitPlatform extends JustAudioPlatform {
+  final Map<String, ResonaMediaKitPlayer> _players = {};
+
   @override
-  Future<AudioPlayerPlatform> init(InitRequest request) async => ResonaMediaKitPlayer(request.id);
+  Future<AudioPlayerPlatform> init(InitRequest request) async {
+    final player = ResonaMediaKitPlayer(request.id);
+    _players[request.id] = player;
+    return player;
+  }
 
   @override
   Future<DisposePlayerResponse> disposePlayer(DisposePlayerRequest request) async {
+    final player = _players.remove(request.id);
+    if (player != null) {
+      await player.release();
+    }
     return DisposePlayerResponse();
   }
 
   @override
   Future<DisposeAllPlayersResponse> disposeAllPlayers(DisposeAllPlayersRequest request) async {
+    final players = _players.values.toList();
+    _players.clear();
+    for (final player in players) {
+      await player.release();
+    }
     return DisposeAllPlayersResponse();
   }
 }
@@ -291,6 +306,26 @@ class ResonaMediaKitPlayer extends AudioPlayerPlatform {
   }
 
   @override
+  Future<StopResponse> stop(StopRequest request) async {
+    _playing = false;
+    if (_mediaOpened) {
+      try {
+        await _player.pause();
+        await _player.stop();
+        if (Platform.isWindows && _player.platform is NativePlayer) {
+          final np = _player.platform as NativePlayer;
+          np.setProperty('pause', 'yes');
+        }
+      } catch (e) {
+        debugPrint('[player] stop error: $e');
+      }
+    }
+    _processingState = ProcessingStateMessage.idle;
+    _updatePlaybackEvent();
+    return StopResponse();
+  }
+
+  @override
   Future<SetVolumeResponse> setVolume(SetVolumeRequest request) {
     return _player
         .setVolume(request.volume * 100.0)
@@ -388,6 +423,16 @@ class ResonaMediaKitPlayer extends AudioPlayerPlatform {
   @override
   Future<void> release() async {
     _mediaOpened = false;
+    _playing = false;
+    try {
+      if (Platform.isWindows && _player.platform is NativePlayer) {
+        final np = _player.platform as NativePlayer;
+        np.setProperty('pause', 'yes');
+        np.setProperty('ao', 'null');
+      }
+      await _player.pause();
+      await _player.stop();
+    } catch (_) {}
     await _player.dispose();
     for (final StreamSubscription subscription in _streamSubscriptions) {
       unawaited(subscription.cancel());
