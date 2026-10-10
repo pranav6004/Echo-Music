@@ -1,8 +1,8 @@
-import 'package:echo_music/data/download_manager.dart';
-import 'package:echo_music/innertube/models/yt_item.dart';
-import 'package:echo_music/lyrics/lyrics_utils.dart';
-import 'package:echo_music/playback/media_metadata.dart';
-import 'package:echo_music/playback/queues.dart';
+import 'package:resona/data/download_manager.dart';
+import 'package:resona/innertube/models/yt_item.dart';
+import 'package:resona/lyrics/lyrics_utils.dart';
+import 'package:resona/playback/media_metadata.dart';
+import 'package:resona/playback/queues.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

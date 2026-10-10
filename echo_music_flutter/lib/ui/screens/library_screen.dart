@@ -269,7 +269,7 @@ class PlaylistMosaic extends StatelessWidget {
         ),
       );
     } else if (thumbnails.length < 4) {
-      content = EchoImage(
+      content = ResonaImage(
         url: thumbnails.first,
         radius: 16,
       );
@@ -281,7 +281,7 @@ class PlaylistMosaic extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           children: [
             for (final t in thumbnails.take(4))
-              EchoImage(url: t, radius: 0, resize: 224),
+              ResonaImage(url: t, radius: 0, resize: 224),
           ],
         ),
       );
@@ -579,7 +579,7 @@ class _ArtistsSliver extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ClipOval(
-                            child: EchoImage(
+                            child: ResonaImage(
                               url: a.artist.thumbnailUrl,
                               width: width * 0.82,
                               height: width * 0.82,

@@ -465,7 +465,7 @@ class _WidescreenStage extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(24),
-                        child: EchoImage(
+                        child: ResonaImage(
                           url: meta.thumbnailUrl,
                           width: 360,
                           height: 360,
@@ -731,7 +731,7 @@ class _CompactStage extends StatelessWidget {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
-                            child: EchoImage(
+                            child: ResonaImage(
                               url: meta.thumbnailUrl,
                               width: size,
                               height: size,

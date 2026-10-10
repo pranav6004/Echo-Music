@@ -21,7 +21,7 @@ class YouLyPlusProvider {
       connectTimeout: const Duration(seconds: 6),
       receiveTimeout: const Duration(seconds: 8),
       headers: {
-        'User-Agent': 'EchoMusic/1.0',
+        'User-Agent': 'Resona/1.0',
       },
     ),
   );

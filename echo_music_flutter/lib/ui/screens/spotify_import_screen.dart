@@ -310,7 +310,7 @@ class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
                     if (_playlist!.coverUrl != null)
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: EchoImage(
+                        child: ResonaImage(
                           url: _playlist!.coverUrl!,
                           width: 80,
                           height: 80,

@@ -1,11 +1,11 @@
 // Live smoke tests against InnerTube (network required). Run with:
 //   flutter test test/innertube_live_test.dart
-import 'package:echo_music/innertube/models/yt_item.dart';
-import 'package:echo_music/innertube/youtube.dart';
-import 'package:echo_music/innertube/youtube_client.dart';
-import 'package:echo_music/lyrics/lyrics_utils.dart';
-import 'package:echo_music/lyrics/providers/lrclib.dart';
-import 'package:echo_music/stream/stream_resolver.dart';
+import 'package:resona/innertube/models/yt_item.dart';
+import 'package:resona/innertube/youtube.dart';
+import 'package:resona/innertube/youtube_client.dart';
+import 'package:resona/lyrics/lyrics_utils.dart';
+import 'package:resona/lyrics/providers/lrclib.dart';
+import 'package:resona/stream/stream_resolver.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -28,8 +28,8 @@ import 'queues.dart';
 /// Items are resolved lazily (the stream URL is fetched only when a track
 /// becomes current, like the Android `ResolvingDataSource`), the next item is
 /// pre-resolved for fast transitions, and the queue persists across launches.
-class EchoAudioHandler extends BaseAudioHandler with SeekHandler {
-  EchoAudioHandler() {
+class ResonaAudioHandler extends BaseAudioHandler with SeekHandler {
+  ResonaAudioHandler() {
     _init();
   }
 

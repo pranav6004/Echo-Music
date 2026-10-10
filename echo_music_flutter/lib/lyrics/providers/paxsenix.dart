@@ -12,7 +12,7 @@ class PaxsenixProvider {
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 15),
       headers: {
-        'User-Agent': 'EchoMusic/1.0',
+        'User-Agent': 'Resona/1.0',
       },
     ),
   );

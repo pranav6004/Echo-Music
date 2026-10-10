@@ -91,7 +91,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        EchoImage(
+                        ResonaImage(
                           url: album.thumbnail,
                           width: 144,
                           height: 144,
@@ -257,7 +257,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    child: EchoCard(
+                    child: ResonaCard(
                       child: Text(
                         page.description!,
                         style: theme.textTheme.bodyMedium,

@@ -1,6 +1,6 @@
-import 'package:echo_music/innertube/models/yt_item.dart';
-import 'package:echo_music/main.dart' as app;
-import 'package:echo_music/playback/player_controller.dart';
+import 'package:resona/innertube/models/yt_item.dart';
+import 'package:resona/main.dart' as app;
+import 'package:resona/playback/player_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:just_audio/just_audio.dart';

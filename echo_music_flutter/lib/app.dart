@@ -10,8 +10,8 @@ import 'ui/screens/login_screen.dart';
 import 'ui/shell/app_navigator.dart';
 import 'ui/shell/main_shell.dart';
 
-class EchoScrollBehavior extends MaterialScrollBehavior {
-  const EchoScrollBehavior();
+class ResonaScrollBehavior extends MaterialScrollBehavior {
+  const ResonaScrollBehavior();
 
   @override
   Set<PointerDeviceKind> get dragDevices => {
@@ -22,14 +22,14 @@ class EchoScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
-class EchoApp extends StatefulWidget {
-  const EchoApp({super.key});
+class ResonaApp extends StatefulWidget {
+  const ResonaApp({super.key});
 
   @override
-  State<EchoApp> createState() => _EchoAppState();
+  State<ResonaApp> createState() => _ResonaAppState();
 }
 
-class _EchoAppState extends State<EchoApp> {
+class _ResonaAppState extends State<ResonaApp> {
   @override
   void initState() {
     super.initState();
@@ -50,13 +50,13 @@ class _EchoAppState extends State<EchoApp> {
         return MaterialApp(
           title: 'Resona',
           debugShowCheckedModeBanner: false,
-          scrollBehavior: const EchoScrollBehavior(),
+          scrollBehavior: const ResonaScrollBehavior(),
           navigatorKey: AppNavigator.rootKey,
-          theme: EchoTheme.build(
+          theme: ResonaTheme.build(
             brightness: Brightness.light,
             settings: settings,
           ),
-          darkTheme: EchoTheme.build(
+          darkTheme: ResonaTheme.build(
             brightness: Brightness.dark,
             settings: settings,
           ),

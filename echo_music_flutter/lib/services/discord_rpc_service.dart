@@ -15,7 +15,7 @@ class DiscordRpcService {
   DiscordRpcService._();
   static final instance = DiscordRpcService._();
 
-  static const _clientId = '1518210534070292541'; // Echo Music official client ID
+  static const _clientId = '1518210534070292541'; // Resona official client ID
   static const _maxPipes = 10;
 
   bool _connected = false;

@@ -1,6 +1,6 @@
-# Echo Music (Flutter: iOS, macOS, Windows & Linux)
+# Resona (Flutter: iOS, macOS, Windows & Linux)
 
-Flutter port of the [Echo Music](../Echo-Music) Android app so it can run on iPhone, iPad, Mac, Windows and Linux.
+Flutter port of the [Resona](../Resona-Music) Android app so it can run on iPhone, iPad, Mac, Windows and Linux.
 It streams from YouTube Music ad-free, with synced lyrics, offline downloads, a local
 library/history database, and background playback with lock-screen / Control Center controls.
 
@@ -19,7 +19,7 @@ library/history database, and background playback with lock-screen / Control Cen
 | UI | Compose screens | `lib/ui/` — Home, Explore (new releases, moods, charts), Search, Library, Album, Artist, Playlists (online + local), History, Stats, Settings, Account, full player, mini player, lyrics, queue |
 
 Not ported (Android-only or out of scope for a first iOS build): Listen Together, Discord
-Rich Presence, Echo Find (ShazamKit), canvas videos, equalizer/DSP, Spotify import,
+Rich Presence, Resona Find (ShazamKit), canvas videos, equalizer/DSP, Spotify import,
 local-media scanning, widgets, Last.fm scrobbling, AI lyric translation.
 
 ## Requirements
@@ -38,7 +38,7 @@ fvm flutter run -d macos            # Mac app
 
 ### On your Mac
 
-`fvm flutter build macos --release` produces `build/macos/Build/Products/Release/Echo Music.app`.
+`fvm flutter build macos --release` produces `build/macos/Build/Products/Release/Resona.app`.
 The app is sandboxed with outgoing network access only (`macos/Runner/*.entitlements`);
 downloads and the database live in its container under `~/Library/Containers/echo.music.iad1tya`.
 The window opens at 1100×780 and can't shrink below 380×640, since the UI is the phone layout.
@@ -47,10 +47,10 @@ The window opens at 1100×780 and can't shrink below 380×640, since the UI is t
 
 Each has to be built on its own OS. The `Flutter Desktop` GitHub Actions workflow
 (`.github/workflows/flutter-desktop.yml` at the repo root) builds both on every push that
-touches `echo_music_flutter/`, and on demand; download the results from the run's Artifacts.
+touches `resona_flutter/`, and on demand; download the results from the run's Artifacts.
 
 - **Windows:** `fvm flutter build windows --release` → `build/windows/x64/runner/Release/`
-  (`EchoMusic.exe` plus its DLLs; ship the whole folder).
+  (`ResonaMusic.exe` plus its DLLs; ship the whole folder).
 - **Linux:** install `clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev`,
   then `fvm flutter build linux --release` → `build/linux/x64/release/bundle/`. Users need
   `libmpv` installed (`sudo apt install libmpv2` or the distro equivalent).

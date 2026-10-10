@@ -134,7 +134,7 @@ class _OnlinePlaylistScreenState extends State<OnlinePlaylistScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        EchoImage(
+                        ResonaImage(
                           url: playlist.thumbnail,
                           width: 144,
                           height: 144,

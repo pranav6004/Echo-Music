@@ -64,7 +64,7 @@ class _ArtistScreenState extends State<ArtistScreen> {
                   : Stack(
                       fit: StackFit.expand,
                       children: [
-                        EchoImage(
+                        ResonaImage(
                           url: page.artist.thumbnail,
                           radius: 0,
                           resize: 1080,
@@ -211,7 +211,7 @@ class _ArtistScreenState extends State<ArtistScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: EchoCard(
+                  child: ResonaCard(
                     onTap: () => setState(() => _descExpanded = !_descExpanded),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

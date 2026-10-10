@@ -339,11 +339,17 @@ class AppDatabase {
   Future<Database> get db async {
     if (_db != null) return _db!;
     final dir = await getApplicationSupportDirectory();
-    final path = p.join(dir.path, 'echo_music.db');
+    final path = p.join(dir.path, 'resona.db');
 
     // Auto-migrate from previous Echo Music AppData if newly created or missing
     try {
       final dbFile = File(path);
+      // Seamless migration from legacy echo_music.db
+      final localLegacyDb = File(p.join(dir.path, 'echo_music.db'));
+      if (localLegacyDb.existsSync() && (!dbFile.existsSync() || dbFile.lengthSync() < localLegacyDb.lengthSync())) {
+        debugPrint('Migrating local legacy echo_music.db to resona.db');
+        localLegacyDb.copySync(path);
+      }
       final oldEchoDir = Directory(p.join(dir.parent.parent.path, 'Echo Music', 'Echo Music'));
       final oldDbFile = File(p.join(oldEchoDir.path, 'echo_music.db'));
       if (oldDbFile.existsSync() && (!dbFile.existsSync() || dbFile.lengthSync() <= 512000)) {

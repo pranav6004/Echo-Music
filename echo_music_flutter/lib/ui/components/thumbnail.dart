@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../core/utils.dart';
 
 /// Network image with YouTube thumbnail resizing and a neutral placeholder.
-class EchoImage extends StatelessWidget {
+class ResonaImage extends StatelessWidget {
   final String? url;
   final double? width;
   final double? height;
@@ -13,7 +13,7 @@ class EchoImage extends StatelessWidget {
   final bool circle;
   final int resize;
 
-  const EchoImage({
+  const ResonaImage({
     super.key,
     required this.url,
     this.width,
@@ -97,7 +97,7 @@ class ItemThumbnail extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          EchoImage(
+          ResonaImage(
             url: url,
             width: size,
             height: size,

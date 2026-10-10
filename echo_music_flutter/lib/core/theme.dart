@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
 
-/// Echo Music design system (see DESIGN.md): seed-based Material color
+/// Resona design system (see DESIGN.md): seed-based Material color
 /// scheme, translucent `surfaceVariant @ 0.3` cards with 24dp radii, pure
 /// black option, bold uppercase section titles.
-class EchoTheme {
-  EchoTheme._();
+class ResonaTheme {
+  ResonaTheme._();
 
   static const seed = Color(0xFFED5564);
   static const cardRadius = 24.0;
@@ -160,7 +160,7 @@ class EchoTheme {
   }
 }
 
-extension EchoColors on ColorScheme {
+extension ResonaColors on ColorScheme {
   /// `surfaceVariant.copy(alpha = 0.3f)` card container used throughout the app.
   Color get translucentCard => surfaceContainerHighest.withValues(alpha: 0.35);
 }

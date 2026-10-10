@@ -1,5 +1,5 @@
-import 'package:echo_music/innertube/youtube_client.dart';
-import 'package:echo_music/ui/screens/charts_screen.dart';
+import 'package:resona/innertube/youtube_client.dart';
+import 'package:resona/ui/screens/charts_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

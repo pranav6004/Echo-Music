@@ -406,7 +406,7 @@ class _AiHubScreenState extends State<AiHubScreen> {
                         const SizedBox(width: 8),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(6),
-                          child: EchoImage(
+                          child: ResonaImage(
                             url: _resolvedSongs[i].thumbnail,
                             width: 44,
                             height: 44,

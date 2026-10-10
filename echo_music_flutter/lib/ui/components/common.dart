@@ -117,9 +117,9 @@ class ChipsRow extends StatelessWidget {
           final isSel = selected == i;
           return Material(
             color: isSel ? scheme.primary : scheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(EchoTheme.chipRadius),
+            borderRadius: BorderRadius.circular(ResonaTheme.chipRadius),
             child: InkWell(
-              borderRadius: BorderRadius.circular(EchoTheme.chipRadius),
+              borderRadius: BorderRadius.circular(ResonaTheme.chipRadius),
               onTap: () => onSelected(isSel ? null : i),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -290,19 +290,19 @@ class ErrorPlaceholder extends StatelessWidget {
 }
 
 /// Translucent rounded container (DESIGN.md "Custom Cards").
-class EchoCard extends StatelessWidget {
+class ResonaCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets padding;
   final EdgeInsets margin;
   final double radius;
   final VoidCallback? onTap;
   final Color? color;
-  const EchoCard({
+  const ResonaCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(16),
     this.margin = EdgeInsets.zero,
-    this.radius = EchoTheme.cardRadius,
+    this.radius = ResonaTheme.cardRadius,
     this.onTap,
     this.color,
   });

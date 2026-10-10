@@ -465,7 +465,7 @@ class _YTGridItemState extends State<YTGridItem> {
       return const SizedBox.shrink();
     }
     final sub = widget.subtitleOverride ?? subtitle;
-    final image = EchoImage(
+    final image = ResonaImage(
       url: it.thumbnail,
       width: widget.width,
       height: widget.width,
@@ -706,10 +706,10 @@ class LibraryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return EchoCard(
+    return ResonaCard(
       onTap: onTap,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      radius: EchoTheme.cardRadius,
+      radius: ResonaTheme.cardRadius,
       child: Row(
         children: [
           Icon(icon, color: theme.colorScheme.onSurface),

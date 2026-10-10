@@ -1,7 +1,7 @@
-import 'package:echo_music/core/utils.dart';
-import 'package:echo_music/data/database.dart';
-import 'package:echo_music/innertube/models/yt_item.dart';
-import 'package:echo_music/playback/media_metadata.dart';
+import 'package:resona/core/utils.dart';
+import 'package:resona/data/database.dart';
+import 'package:resona/innertube/models/yt_item.dart';
+import 'package:resona/playback/media_metadata.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

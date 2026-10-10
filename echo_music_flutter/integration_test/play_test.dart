@@ -1,6 +1,6 @@
-import 'package:echo_music/innertube/youtube.dart';
-import 'package:echo_music/main.dart' as app;
-import 'package:echo_music/playback/player_controller.dart';
+import 'package:resona/innertube/youtube.dart';
+import 'package:resona/main.dart' as app;
+import 'package:resona/playback/player_controller.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';

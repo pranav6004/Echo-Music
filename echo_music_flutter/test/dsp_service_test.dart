@@ -1,4 +1,4 @@
-import 'package:echo_music/services/dsp_service.dart';
+import 'package:resona/services/dsp_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

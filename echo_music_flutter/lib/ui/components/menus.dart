@@ -66,7 +66,7 @@ Future<void> _showMenu(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
                 child: Row(
                   children: [
-                    EchoImage(
+                    ResonaImage(
                       url: thumbnail,
                       width: 56,
                       height: 56,
@@ -678,7 +678,7 @@ Future<void> showAddToPlaylistSheet(
                       itemBuilder: (_, i) {
                         final p = playlists[i];
                         return ListTile(
-                          leading: EchoImage(
+                          leading: ResonaImage(
                             url: p.thumbnailUrl,
                             width: 44,
                             height: 44,

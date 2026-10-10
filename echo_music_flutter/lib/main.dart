@@ -30,7 +30,7 @@ Future<void> main() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
     JustAudioMediaKit.ensureInitialized();
-    JustAudioPlatform.instance = EchoMediaKitPlatform();
+    JustAudioPlatform.instance = ResonaMediaKitPlatform();
   }
   final settings = await Settings.init();
   await AppDatabase.instance.db;
@@ -66,12 +66,12 @@ Future<void> main() async {
     AudioQualityPrefSetting.low => AudioQualityPref.low,
   };
 
-  EchoAudioHandler handler;
+  ResonaAudioHandler handler;
   try {
     handler = await AudioService.init(
-      builder: () => EchoAudioHandler(),
+      builder: () => ResonaAudioHandler(),
       config: const AudioServiceConfig(
-        androidNotificationChannelId: 'echo.music.channel.audio',
+        androidNotificationChannelId: 'resona.channel.audio',
         androidNotificationChannelName: 'Resona',
         androidNotificationOngoing: true,
         androidStopForegroundOnPause: true,
@@ -80,12 +80,12 @@ Future<void> main() async {
   } on MissingPluginException {
     // audio_service has no Windows implementation: play without OS media
     // controls rather than failing to start.
-    handler = EchoAudioHandler();
+    handler = ResonaAudioHandler();
   }
   PlayerController.instance.handler = handler;
   await DownloadManager.instance.load();
 
-  runApp(const EchoApp());
+  runApp(const ResonaApp());
 
   // Background warm-ups.
   if (settings.isLoggedIn && settings.ytmSync) {

@@ -8,9 +8,9 @@ import 'package:media_kit/media_kit.dart';
 
 import '../services/dsp_service.dart';
 
-class EchoMediaKitPlatform extends JustAudioPlatform {
+class ResonaMediaKitPlatform extends JustAudioPlatform {
   @override
-  Future<AudioPlayerPlatform> init(InitRequest request) async => EchoMediaKitPlayer(request.id);
+  Future<AudioPlayerPlatform> init(InitRequest request) async => ResonaMediaKitPlayer(request.id);
 
   @override
   Future<DisposePlayerResponse> disposePlayer(DisposePlayerRequest request) async {
@@ -23,7 +23,7 @@ class EchoMediaKitPlatform extends JustAudioPlatform {
   }
 }
 
-class EchoMediaKitPlayer extends AudioPlayerPlatform {
+class ResonaMediaKitPlayer extends AudioPlayerPlatform {
   late final Player _player;
   late final List<StreamSubscription> _streamSubscriptions;
   final _readyCompleter = Completer<void>();
@@ -51,7 +51,7 @@ class EchoMediaKitPlayer extends AudioPlayerPlatform {
     return medias[_player.state.playlist.index];
   }
 
-  EchoMediaKitPlayer(super.id) {
+  ResonaMediaKitPlayer(super.id) {
     _player = Player(
       configuration: PlayerConfiguration(
         pitch: JustAudioMediaKit.pitch,

@@ -11,7 +11,7 @@ class MainFlutterWindow: NSWindow {
     self.contentMinSize = NSSize(width: 380, height: 640)
     self.setContentSize(NSSize(width: 1100, height: 780))
     self.center()
-    self.setFrameAutosaveName("EchoMusicMainWindow")
+    self.setFrameAutosaveName("ResonaMainWindow")
 
     RegisterGeneratedPlugins(registry: flutterViewController)
 

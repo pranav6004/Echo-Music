@@ -95,7 +95,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                       borderRadius: BorderRadius.circular(8),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: EchoImage(
+                        child: ResonaImage(
                           url: meta.thumbnailUrl,
                           width: 52,
                           height: 52,

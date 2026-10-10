@@ -82,7 +82,7 @@ class MiniPlayer extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
                       children: [
-                        EchoImage(
+                        ResonaImage(
                           url: meta.thumbnailUrl,
                           width: 46,
                           height: 46,

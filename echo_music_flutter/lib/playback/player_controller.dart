@@ -14,7 +14,7 @@ class PlayerController {
   PlayerController._();
   static final PlayerController instance = PlayerController._();
 
-  late EchoAudioHandler handler;
+  late ResonaAudioHandler handler;
 
   bool get hasQueue => handler.queueItems.value.isNotEmpty;
 

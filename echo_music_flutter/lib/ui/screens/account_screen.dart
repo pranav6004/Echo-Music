@@ -115,10 +115,10 @@ class _AccountScreenState extends State<AccountScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: EchoCard(
+                  child: ResonaCard(
                     child: Row(
                       children: [
-                        EchoImage(
+                        ResonaImage(
                           url: s.accountAvatarUrl,
                           width: 56,
                           height: 56,

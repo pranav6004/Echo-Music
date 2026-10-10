@@ -87,7 +87,7 @@ class ListenTogetherService extends ChangeNotifier {
   String? _userId;
   String? get userId => _userId;
 
-  String _username = 'Echo Listener';
+  String _username = 'Resona Listener';
   String get username => _username;
 
   bool _isHost = false;
@@ -112,7 +112,7 @@ class ListenTogetherService extends ChangeNotifier {
   Future<void> Function(SyncedTrack track, bool play, int positionMs)? onSyncRequest;
 
   void setUsername(String name) {
-    _username = name.trim().isEmpty ? 'Echo Listener' : name.trim();
+    _username = name.trim().isEmpty ? 'Resona Listener' : name.trim();
     notifyListeners();
   }
 

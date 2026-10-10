@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = Echo Music
+PRODUCT_NAME = Resona
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = echo.music.iad1tya
+PRODUCT_BUNDLE_IDENTIFIER = io.resona.music
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 Echo Music. All rights reserved.

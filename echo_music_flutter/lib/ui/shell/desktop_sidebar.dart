@@ -290,7 +290,7 @@ class DesktopSidebar extends StatelessWidget {
                       child: Row(
                         children: [
                           if (isLoggedIn && settings.accountAvatarUrl.isNotEmpty)
-                            EchoImage(
+                            ResonaImage(
                               url: settings.accountAvatarUrl,
                               width: 32,
                               height: 32,

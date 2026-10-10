@@ -919,7 +919,7 @@ class _StorageSettingsState extends State<StorageSettings> {
       dir ??= await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
 
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-').split('.').first;
-      final file = File(p.join(dir.path, 'echo_music_backup_$timestamp.json'));
+      final file = File(p.join(dir.path, 'resona_backup_$timestamp.json'));
       await file.writeAsString(jsonStr, encoding: utf8);
 
       if (context.mounted) {
@@ -955,7 +955,7 @@ class _StorageSettingsState extends State<StorageSettings> {
       }
       dir ??= await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
       if (await dir.exists()) {
-        final list = dir.listSync().whereType<File>().where((f) => f.path.contains('echo_music_backup_')).toList();
+        final list = dir.listSync().whereType<File>().where((f) => f.path.contains('resona_backup_')).toList();
         if (list.isNotEmpty) {
           list.sort((a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()));
           defaultPath = list.first.path;
@@ -975,14 +975,14 @@ class _StorageSettingsState extends State<StorageSettings> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Enter the full path to an Echo Music JSON backup file:',
+              'Enter the full path to an Resona JSON backup file:',
               style: TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
               decoration: const InputDecoration(
-                hintText: 'C:\\Users\\...\\Downloads\\echo_music_backup.json',
+                hintText: 'C:\\Users\\...\\Downloads\\resona_backup.json',
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
@@ -1140,7 +1140,7 @@ class AboutScreen extends StatelessWidget {
           MediaQuery.paddingOf(context).bottom + 24,
         ),
         children: [
-          EchoCard(
+          ResonaCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1213,7 +1213,7 @@ class AboutScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Special thanks: Metrolist, InnerTune, SimpMusic, ViMusic, OuterTune — the InnerTube parsing, lyrics providers and queue logic are ported from the Echo Music Android codebase which builds on their work.',
+            'Special thanks: Metrolist, InnerTune, SimpMusic, ViMusic, OuterTune — the InnerTube parsing, lyrics providers and queue logic are ported from the Resona Android codebase which builds on their work.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

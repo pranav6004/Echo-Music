@@ -290,7 +290,7 @@ ChartsPage? _page;
           const SizedBox(width: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
-            child: EchoImage(
+            child: ResonaImage(
               url: item.thumbnail,
               width: 48,
               height: 48,

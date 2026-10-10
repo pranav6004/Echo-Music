@@ -430,7 +430,7 @@ class _HomeSection extends StatelessWidget {
             onTap: onMore,
             onPlayAll: () => player.playSongItems(songs, title: section.title),
             thumbnail: section.thumbnail != null
-                ? EchoImage(
+                ? ResonaImage(
                     url: section.thumbnail,
                     width: 44,
                     height: 44,
@@ -472,7 +472,7 @@ class _AccountAvatar extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: s.isLoggedIn && s.accountAvatarUrl.isNotEmpty
-                ? EchoImage(
+                ? ResonaImage(
                     url: s.accountAvatarUrl,
                     width: 32,
                     height: 32,
