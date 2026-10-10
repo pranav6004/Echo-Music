@@ -363,7 +363,7 @@ class AppDatabase {
       }
       final oldPrefs = File(p.join(oldEchoDir.path, 'shared_preferences.json'));
       final newPrefs = File(p.join(dir.path, 'shared_preferences.json'));
-      if (oldPrefs.existsSync() && (!newPrefs.existsSync() || newPrefs.lengthSync() < oldPrefs.lengthSync())) {
+      if (oldPrefs.existsSync() && !newPrefs.existsSync()) {
         debugPrint('Migrating previous shared_preferences from ${oldPrefs.path} to ${newPrefs.path}');
         oldPrefs.copySync(newPrefs.path);
       }

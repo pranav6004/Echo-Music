@@ -1,3 +1,4 @@
+import '../../services/discord_rpc_service.dart';
 import 'dart:ui';
 import '../../innertube/youtube.dart';
 import '../../innertube/youtube_client.dart';
@@ -1235,6 +1236,52 @@ class IntegrationsSettings extends StatefulWidget {
 }
 
 class _IntegrationsSettingsState extends State<IntegrationsSettings> {
+  Future<void> _editDiscordClientId(BuildContext context) async {
+    final s = Settings.instance;
+    final controller = TextEditingController(text: s.discordClientId);
+    final newId = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Discord Application ID'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Custom Application ID from discord.com/developers/applications. Leave empty for Resona default.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Application / Client ID',
+                hintText: '1558422196802555934',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    if (newId != null) {
+      s.discordClientId = newId;
+      setState(() {});
+      DiscordRpcService.instance.disconnect();
+      DiscordRpcService.instance.connect();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = Settings.instance;
