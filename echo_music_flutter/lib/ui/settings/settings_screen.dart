@@ -1251,8 +1251,25 @@ class _IntegrationsSettingsState extends State<IntegrationsSettings> {
               value: s.enableDiscordRpc,
               onChanged: (v) {
                 setState(() => s.enableDiscordRpc = v);
+                if (v) {
+                  DiscordRpcService.instance.connect();
+                } else {
+                  DiscordRpcService.instance.disconnect();
+                }
               },
             ),
+            if (s.enableDiscordRpc)
+              _Row(
+                icon: Icons.badge_outlined,
+                title: 'Discord Application ID',
+                subtitle: s.discordClientId.isEmpty
+                    ? 'Default (1518210534070292541)'
+                    : s.discordClientId,
+                trailing: TextButton(
+                  onPressed: () => _editDiscordClientId(context),
+                  child: const Text('Change'),
+                ),
+              ),
           ],
         ),
         _Group(

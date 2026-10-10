@@ -15,7 +15,12 @@ class DiscordRpcService {
   DiscordRpcService._();
   static final instance = DiscordRpcService._();
 
-  static const _clientId = '1518210534070292541'; // Resona official client ID
+  static const _defaultClientId = '1518210534070292541'; // Resona default client ID
+
+  String get clientId {
+    final custom = Settings.instance.discordClientId.trim();
+    return custom.isNotEmpty ? custom : _defaultClientId;
+  }
   static const _maxPipes = 10;
 
   bool _connected = false;
@@ -123,7 +128,7 @@ class DiscordRpcService {
   }
 
   void _sendHandshake() {
-    final payload = jsonEncode({'v': 1, 'client_id': _clientId});
+    final payload = jsonEncode({'v': 1, 'client_id': clientId});
     _sendPacket(0, payload); // Opcode 0 = HANDSHAKE
   }
 

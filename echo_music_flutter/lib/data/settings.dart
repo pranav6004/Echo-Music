@@ -296,6 +296,8 @@ class Settings extends ChangeNotifier {
   // Discord Rich Presence
   bool get enableDiscordRpc => _prefs.getBool('enableDiscordRpc') ?? true;
   set enableDiscordRpc(bool v) => _set('enableDiscordRpc', v);
+  String get discordClientId => _prefs.getString('discordClientId') ?? '';
+  set discordClientId(String v) => _set('discordClientId', v);
 
   // Last.fm Scrobbler
   bool get enableLastFm => _prefs.getBool('enableLastFm') ?? false;
