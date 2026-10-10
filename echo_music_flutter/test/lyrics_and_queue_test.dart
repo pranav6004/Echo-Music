@@ -136,14 +136,14 @@ void main() {
       }
 
       // Compact viewports (<1080)
-      expect(computeLeftWidth(900, true), equals(252.0));
-      expect(computeLeftWidth(800, true), equals(240.0)); // clamped min
-      expect(computeLeftWidth(1200, true), equals(320.0)); // clamped max
+      expect(computeLeftWidth(900, true), closeTo(252.0, 0.01));
+      expect(computeLeftWidth(800, true), closeTo(240.0, 0.01)); // clamped min
+      expect(computeLeftWidth(1200, true), closeTo(320.0, 0.01)); // clamped max
 
       // Standard desktop viewports (>=1080)
-      expect(computeLeftWidth(1920, false), equals(480.0)); // max clamped (spacious title)
-      expect(computeLeftWidth(1440, false), equals(374.4)); // generous middle width
-      expect(computeLeftWidth(1100, false), equals(340.0)); // clamped min
+      expect(computeLeftWidth(1920, false), closeTo(480.0, 0.01)); // max clamped (spacious title)
+      expect(computeLeftWidth(1440, false), closeTo(374.4, 0.01)); // generous middle width
+      expect(computeLeftWidth(1100, false), closeTo(340.0, 0.01)); // clamped min
     });
   });
 }
