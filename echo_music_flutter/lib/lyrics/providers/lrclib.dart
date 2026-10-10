@@ -12,7 +12,7 @@ class LrcLibProvider {
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 15),
       headers: {
-        'User-Agent': 'EchoMusic/1.0 (https://github.com/iad1tya/Echo-Music)',
+        'User-Agent': 'Resona/1.0 (https://github.com/pranav6004/Echo-Music)',
       },
     ),
   );

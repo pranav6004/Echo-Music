@@ -69,14 +69,14 @@ void main() {
       subFilters.add('equalizer=f=31:width_type=o:width=1.0:g=6.0');
       subFilters.add('bass=g=5.0:f=100');
       subFilters.add('aformat=channel_layouts=stereo');
-      subFilters.add('stereotools=mode=lr>lr:slev=1.50:mlev=1.0');
+      subFilters.add('stereotools=slev=1.50');
 
       final afString = subFilters.isEmpty ? '' : 'lavfi=[${subFilters.join(',')}]';
 
       expect(afString, startsWith('lavfi=['));
       expect(afString, endsWith(']'));
       expect(afString, contains('aformat=channel_layouts=stereo'));
-      expect(afString, contains('stereotools=mode=lr>lr:slev=1.50:mlev=1.0'));
+      expect(afString, contains('stereotools=slev=1.50'));
       expect(afString, contains('bass=g=5.0:f=100'));
       expect(afString, contains('volume=volume=-1.0dB'));
     });

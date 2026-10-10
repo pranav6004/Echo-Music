@@ -173,7 +173,7 @@ class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Paste any public Spotify playlist URL to find matching high-res tracks and import into your Echo Music library.',
+                            'Paste any public Spotify playlist URL to find matching high-res tracks and import into your Resona library.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: scheme.onSurfaceVariant,
                             ),

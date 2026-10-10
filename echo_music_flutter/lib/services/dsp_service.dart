@@ -127,7 +127,12 @@ class DspService extends ChangeNotifier {
     // 3. Spatial Audio / Stereo Widener (Mid-Side widening with stereo format guarantee)
     if (s.enableSpatialAudio && s.spatialAudioWidth > 1.0) {
       subFilters.add('aformat=channel_layouts=stereo');
-      subFilters.add('stereotools=mode=lr>lr:slev=${s.spatialAudioWidth.toStringAsFixed(2)}:mlev=1.0');
+      subFilters.add('stereotools=slev=${s.spatialAudioWidth.toStringAsFixed(2)}');
+    }
+
+    // In WASAPI Exclusive mode, direct hardware bitstream output is enforced; bypass software filter graph
+    if (s.wasapiExclusive) {
+      subFilters.clear();
     }
 
     // Unify all filters into a single libavfilter graph to prevent inter-filter bridge failures
@@ -158,6 +163,7 @@ class DspService extends ChangeNotifier {
         debugPrint('WASAPI exclusive toggle failed: $e');
       }
     }
+    await applyFilters();
     notifyListeners();
   }
 

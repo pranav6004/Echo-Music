@@ -145,6 +145,14 @@ class EchoMediaKitPlayer extends AudioPlayerPlatform {
               (_player.platform as NativePlayer).setProperty('af', '');
             } catch (_) {}
           }
+          // Prevent hanging _loadCompleter if filter initialization failed during track load
+          if (_processingState == ProcessingStateMessage.loading) {
+            _processingState = ProcessingStateMessage.ready;
+            _updatePlaybackEvent();
+            if (_loadCompleter?.isCompleted != true) {
+              _loadCompleter?.complete(_duration);
+            }
+          }
           return;
         }
 
@@ -243,15 +251,22 @@ class EchoMediaKitPlayer extends AudioPlayerPlatform {
     }
     _mediaOpened = true;
 
-    // Apply active audio DSP filters on track start
-    unawaited(DspService.instance.applyFilters());
+    // Audio DSP filters are persistent on mpv instance and handled cleanly via DspService
 
     if (request.initialPosition != null) {
       _setPosition = _position = request.initialPosition!;
     }
 
     _updatePlaybackEvent();
-    final duration = await _loadCompleter?.future;
+    final duration = await _loadCompleter?.future.timeout(
+      const Duration(seconds: 6),
+      onTimeout: () {
+        debugPrint('[player] load timed out waiting for buffering; continuing playback');
+        _processingState = ProcessingStateMessage.ready;
+        _updatePlaybackEvent();
+        return _duration;
+      },
+    );
     return LoadResponse(duration: duration);
   }
 

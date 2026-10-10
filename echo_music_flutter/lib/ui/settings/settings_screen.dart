@@ -141,7 +141,7 @@ class SettingsScreen extends StatelessWidget {
                 _Row(
                   icon: Icons.info_outline_rounded,
                   title: 'About',
-                  subtitle: Platform.isWindows ? 'Echo Music Desktop' : 'Echo Music',
+                  subtitle: 'Resona Desktop',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const AboutScreen()),
                   ),
@@ -1159,7 +1159,7 @@ class AboutScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Echo Music',
+                          'Resona',
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
@@ -1189,9 +1189,9 @@ class AboutScreen extends StatelessWidget {
               _Row(
                 icon: Icons.code_rounded,
                 title: 'Source code',
-                subtitle: 'github.com/iad1tya/Echo-Music',
+                subtitle: 'github.com/pranav6004/Echo-Music',
                 onTap: () => launchUrl(
-                  Uri.parse('https://github.com/iad1tya/Echo-Music'),
+                  Uri.parse('https://github.com/pranav6004/Echo-Music'),
                   mode: LaunchMode.externalApplication,
                 ),
               ),

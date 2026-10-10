@@ -340,6 +340,29 @@ class AppDatabase {
     if (_db != null) return _db!;
     final dir = await getApplicationSupportDirectory();
     final path = p.join(dir.path, 'echo_music.db');
+
+    // Auto-migrate from previous Echo Music AppData if newly created or missing
+    try {
+      final dbFile = File(path);
+      final oldEchoDir = Directory(p.join(dir.parent.parent.path, 'Echo Music', 'Echo Music'));
+      final oldDbFile = File(p.join(oldEchoDir.path, 'echo_music.db'));
+      if (oldDbFile.existsSync() && (!dbFile.existsSync() || dbFile.lengthSync() <= 512000)) {
+        if (!dbFile.existsSync() || oldDbFile.lengthSync() > dbFile.lengthSync()) {
+          debugPrint('Migrating previous database from ${oldDbFile.path} to $path');
+          dbFile.parent.createSync(recursive: true);
+          oldDbFile.copySync(path);
+        }
+      }
+      final oldPrefs = File(p.join(oldEchoDir.path, 'shared_preferences.json'));
+      final newPrefs = File(p.join(dir.path, 'shared_preferences.json'));
+      if (oldPrefs.existsSync() && (!newPrefs.existsSync() || newPrefs.lengthSync() < oldPrefs.lengthSync())) {
+        debugPrint('Migrating previous shared_preferences from ${oldPrefs.path} to ${newPrefs.path}');
+        oldPrefs.copySync(newPrefs.path);
+      }
+    } catch (e) {
+      debugPrint('Data migration warning: $e');
+    }
+
     _db = await openDatabase(
       path,
       version: 1,
@@ -1567,7 +1590,7 @@ class AppDatabase {
     final d = await db;
     return {
       'version': 1,
-      'app': 'Echo Music',
+      'app': 'Resona',
       'exportedAt': DateTime.now().toIso8601String(),
       'tables': {
         'song': await d.query('song'),

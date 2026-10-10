@@ -123,8 +123,8 @@ class AiService {
         'Content-Type': 'application/json',
         if (apiKey.isNotEmpty) 'Authorization': 'Bearer $apiKey',
         if (provider == 'openrouter') ...{
-          'HTTP-Referer': 'https://github.com/koiverse/Echo-Music',
-          'X-Title': 'Echo Music Desktop',
+          'HTTP-Referer': 'https://github.com/pranav6004/Echo-Music',
+          'X-Title': 'Resona Desktop',
         },
       };
 

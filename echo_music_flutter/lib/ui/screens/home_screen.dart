@@ -191,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen>
             SliverAppBar(
               floating: true,
               snap: true,
-              title: const Text('Echo Music'),
+              title: const Text('Resona'),
               actions: [
                 IconButton(
                   onPressed: AppNavigator.openHistory,
