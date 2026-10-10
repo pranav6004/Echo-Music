@@ -40,6 +40,17 @@ class _LyricsViewState extends State<LyricsView> {
   }
 
   @override
+  void didUpdateWidget(covariant LyricsView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.meta.id != widget.meta.id) {
+      _current = -1;
+      _lines = const [];
+      _result = null;
+      _load();
+    }
+  }
+
+  @override
   void dispose() {
     _sub?.cancel();
     super.dispose();

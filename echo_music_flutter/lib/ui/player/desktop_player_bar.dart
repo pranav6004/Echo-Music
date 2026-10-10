@@ -78,8 +78,10 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
 
           final screenW = MediaQuery.sizeOf(context).width;
           final isCompact = screenW < 1080;
-          final leftWidth = isCompact ? 240.0 : 310.0;
-          final rightWidth = isCompact ? 240.0 : 310.0;
+          final leftWidth = isCompact
+              ? (screenW * 0.28).clamp(240.0, 320.0)
+              : (screenW * 0.26).clamp(340.0, 480.0);
+          final rightWidth = isCompact ? 220.0 : 280.0;
 
           return Row(
             children: [
@@ -108,15 +110,19 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          InkWell(
-                            onTap: AppNavigator.openPlayer,
-                            borderRadius: BorderRadius.circular(4),
-                            child: Text(
-                              meta.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
+                          Tooltip(
+                            message: meta.title,
+                            waitDuration: const Duration(milliseconds: 500),
+                            child: InkWell(
+                              onTap: AppNavigator.openPlayer,
+                              borderRadius: BorderRadius.circular(4),
+                              child: Text(
+                                meta.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ),

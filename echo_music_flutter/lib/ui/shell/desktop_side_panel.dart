@@ -93,6 +93,7 @@ class DesktopSidePanel extends StatelessWidget {
                         );
                       }
                       return LyricsView(
+                        key: ValueKey('lyrics-${meta.id}'),
                         meta: meta,
                         textColor: scheme.onSurface,
                       );

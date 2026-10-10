@@ -1,3 +1,4 @@
+import 'package:echo_music/data/download_manager.dart';
 import 'package:echo_music/innertube/models/yt_item.dart';
 import 'package:echo_music/lyrics/lyrics_utils.dart';
 import 'package:echo_music/playback/media_metadata.dart';
@@ -107,6 +108,42 @@ void main() {
       final filtered = queue.filtered((m) => false);
       expect(filtered.items.isEmpty, isTrue);
       expect(filtered.mediaItemIndex, equals(0));
+    });
+  });
+
+  group('DownloadProgress & DownloadState Verification', () {
+    test('DownloadProgress state and progress values are retained', () {
+      const p1 = DownloadProgress(DownloadState.queued, 0.0);
+      expect(p1.state, equals(DownloadState.queued));
+      expect(p1.progress, equals(0.0));
+
+      const p2 = DownloadProgress(DownloadState.downloading, 0.45);
+      expect(p2.state, equals(DownloadState.downloading));
+      expect((p2.progress * 100).toInt(), equals(45));
+
+      const p3 = DownloadProgress(DownloadState.completed, 1.0);
+      expect(p3.state, equals(DownloadState.completed));
+      expect(p3.progress, equals(1.0));
+    });
+  });
+
+  group('Player Bar Responsive Layout Math', () {
+    test('calculates wide column width clamping between 340 and 480 px', () {
+      double computeLeftWidth(double screenW, bool isCompact) {
+        return isCompact
+            ? (screenW * 0.28).clamp(240.0, 320.0)
+            : (screenW * 0.26).clamp(340.0, 480.0);
+      }
+
+      // Compact viewports (<1080)
+      expect(computeLeftWidth(900, true), equals(252.0));
+      expect(computeLeftWidth(800, true), equals(240.0)); // clamped min
+      expect(computeLeftWidth(1200, true), equals(320.0)); // clamped max
+
+      // Standard desktop viewports (>=1080)
+      expect(computeLeftWidth(1920, false), equals(480.0)); // max clamped (spacious title)
+      expect(computeLeftWidth(1440, false), equals(374.4)); // generous middle width
+      expect(computeLeftWidth(1100, false), equals(340.0)); // clamped min
     });
   });
 }

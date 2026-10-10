@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../core/utils.dart';
 import '../../data/database.dart';
+import '../../data/download_manager.dart';
 import '../../innertube/models/yt_item.dart';
 import '../../playback/media_metadata.dart';
 import '../../playback/player_controller.dart';
@@ -27,6 +28,7 @@ class MediaListTile extends StatelessWidget {
   final bool explicit;
   final bool liked;
   final bool downloaded;
+  final String? songId;
   final double thumbnailSize;
   final Color? color;
   final double radius;
@@ -47,6 +49,7 @@ class MediaListTile extends StatelessWidget {
     this.explicit = false,
     this.liked = false,
     this.downloaded = false,
+    this.songId,
     this.thumbnailSize = 48,
     this.color,
     this.radius = 16,
@@ -126,7 +129,60 @@ class MediaListTile extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                             ],
-                            if (downloaded) ...[
+                            if (songId != null)
+                              ListenableBuilder(
+                                listenable: DownloadManager.instance,
+                                builder: (context, _) {
+                                  final prog = DownloadManager.instance.stateOf(songId!);
+                                  if (prog != null && prog.state == DownloadState.downloading) {
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                          width: 12,
+                                          height: 12,
+                                          child: CircularProgressIndicator(
+                                            value: prog.progress > 0 ? prog.progress : null,
+                                            strokeWidth: 2,
+                                            color: scheme.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${(prog.progress * 100).toInt()}%',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: scheme.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                      ],
+                                    );
+                                  }
+                                  if (prog != null && prog.state == DownloadState.queued) {
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.schedule_rounded, size: 14, color: scheme.onSurfaceVariant),
+                                        const SizedBox(width: 4),
+                                      ],
+                                    );
+                                  }
+                                  final isDl = downloaded || DownloadManager.instance.isDownloaded(songId!);
+                                  if (isDl) {
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.offline_pin_rounded, size: 14, color: scheme.onSurfaceVariant),
+                                        const SizedBox(width: 4),
+                                      ],
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              )
+                            else if (downloaded) ...[
                               Icon(
                                 Icons.offline_pin_rounded,
                                 size: 14,
@@ -235,6 +291,7 @@ class YTItemTile extends StatelessWidget {
           ]),
           thumbnailUrl: it.thumbnail,
           explicit: it.explicit,
+          songId: it.id,
           isActive: active,
           isPlaying: playing,
           index: index,
@@ -329,6 +386,7 @@ class LocalSongTile extends StatelessWidget {
         explicit: song.song.explicit,
         liked: showLiked && song.song.liked,
         downloaded: downloaded || song.song.dateDownload != null,
+        songId: song.id,
         isActive: active,
         isPlaying: playing,
         index: index,

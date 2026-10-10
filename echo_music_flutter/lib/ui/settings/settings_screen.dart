@@ -1062,17 +1062,34 @@ class _StorageSettingsState extends State<StorageSettings> {
         ),
         _Group(
           children: [
-            _Row(
-              icon: Icons.offline_pin_outlined,
-              title: 'Downloaded songs',
-              subtitle: formatBytes(_downloadBytes),
-              trailing: TextButton(
-                onPressed: () async {
-                  await DownloadManager.instance.removeAll();
-                  if (mounted) setState(() => _downloadBytes = 0);
-                },
-                child: const Text('Clear'),
-              ),
+            FutureBuilder<String>(
+              future: DownloadManager.instance.downloadFolderPath,
+              builder: (context, snapshot) {
+                final folder = snapshot.data ?? 'Documents\\downloads';
+                return _Row(
+                  icon: Icons.offline_pin_outlined,
+                  title: 'Downloaded songs',
+                  subtitle: '${formatBytes(_downloadBytes)} • $folder',
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton.icon(
+                        icon: const Icon(Icons.folder_open_rounded, size: 16),
+                        label: const Text('Open'),
+                        onPressed: () => DownloadManager.instance.openDownloadsFolder(),
+                      ),
+                      const SizedBox(width: 4),
+                      TextButton(
+                        onPressed: () async {
+                          await DownloadManager.instance.removeAll();
+                          if (mounted) setState(() => _downloadBytes = 0);
+                        },
+                        child: const Text('Clear'),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
             _Row(
               icon: Icons.image_outlined,

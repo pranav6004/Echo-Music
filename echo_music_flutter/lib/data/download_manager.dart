@@ -156,6 +156,26 @@ class DownloadManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<String> get downloadFolderPath async {
+    final d = await _dir();
+    return d.path;
+  }
+
+  Future<void> openDownloadsFolder() async {
+    final d = await _dir();
+    try {
+      if (Platform.isWindows) {
+        await Process.run('explorer.exe', [d.path]);
+      } else if (Platform.isLinux) {
+        await Process.run('xdg-open', [d.path]);
+      } else if (Platform.isMacOS) {
+        await Process.run('open', [d.path]);
+      }
+    } catch (e) {
+      debugPrint('Failed to open downloads folder: $e');
+    }
+  }
+
   Future<void> removeAll() async {
     for (final id in _downloaded.toList()) {
       await remove(id);

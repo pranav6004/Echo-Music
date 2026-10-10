@@ -198,6 +198,12 @@ class _LocalPlaylistScreenState extends State<LocalPlaylistScreen> {
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
+                                        if (_isDownloaded)
+                                          RoundIconButton(
+                                            icon: Icons.folder_open_rounded,
+                                            size: 40,
+                                            onPressed: () => DownloadManager.instance.openDownloadsFolder(),
+                                          ),
                                         if (!_isDownloaded)
                                           RoundIconButton(
                                             icon: Icons.download_rounded,
