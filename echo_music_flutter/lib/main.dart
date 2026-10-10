@@ -64,7 +64,6 @@ Future<void> main() async {
     AudioQualityPrefSetting.auto => AudioQualityPref.auto,
     AudioQualityPrefSetting.high => AudioQualityPref.high,
     AudioQualityPrefSetting.low => AudioQualityPref.low,
-    AudioQualityPrefSetting.lossless => AudioQualityPref.lossless,
   };
 
   EchoAudioHandler handler;

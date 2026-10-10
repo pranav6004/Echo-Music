@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum DarkModePref { auto, on, off }
 
-enum AudioQualityPrefSetting { auto, high, low, lossless }
+enum AudioQualityPrefSetting { auto, high, low }
 
 enum PlayerBackgroundStyle { gradient, blur, plain }
 

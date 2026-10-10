@@ -557,14 +557,12 @@ class PlayerSettings extends StatelessWidget {
                 AudioQualityPrefSetting.auto => 'Auto',
                 AudioQualityPrefSetting.high => 'High',
                 AudioQualityPrefSetting.low => 'Low (data saver)',
-                AudioQualityPrefSetting.lossless => 'Lossless (FLAC 1411 kbps)',
               },
               onTap: () async {
                 final v = await _pick(context, 'Audio quality', const [
                   (AudioQualityPrefSetting.auto, 'Auto'),
                   (AudioQualityPrefSetting.high, 'High (Opus 160k / AAC 256k)'),
                   (AudioQualityPrefSetting.low, 'Low (data saver)'),
-                  (AudioQualityPrefSetting.lossless, 'Lossless (FLAC 1411 kbps where available)'),
                 ], s.audioQuality);
                 if (v != null) {
                   s.audioQuality = v;
@@ -572,7 +570,6 @@ class PlayerSettings extends StatelessWidget {
                     AudioQualityPrefSetting.auto => AudioQualityPref.auto,
                     AudioQualityPrefSetting.high => AudioQualityPref.high,
                     AudioQualityPrefSetting.low => AudioQualityPref.low,
-                    AudioQualityPrefSetting.lossless => AudioQualityPref.lossless,
                   };
                   StreamResolver.instance.clearCache();
                 }
