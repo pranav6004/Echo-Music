@@ -403,7 +403,15 @@ class _LikeButton extends StatelessWidget {
             shape: const CircleBorder(),
             child: InkWell(
               customBorder: const CircleBorder(),
-              onTap: () => player.toggleLike(meta),
+              onTap: () async {
+                final res = await player.toggleLike(meta);
+                if (context.mounted) {
+                  showSnack(
+                    context,
+                    res ? 'Added to Liked Songs' : 'Removed from Liked Songs',
+                  );
+                }
+              },
               child: Icon(
                 liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                 color: liked ? const Color(0xFFFF5C7A) : onBg,

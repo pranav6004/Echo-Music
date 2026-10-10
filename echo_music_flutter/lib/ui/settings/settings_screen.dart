@@ -776,6 +776,7 @@ class ContentSettings extends StatelessWidget {
               onTap: () async {
                 final v = await _pick(context, 'Content country', const [
                   ('system', 'System default'),
+                  ('GLOBAL', 'Global / Worldwide'),
                   ('US', 'United States'),
                   ('GB', 'United Kingdom'),
                   ('IN', 'India'),
@@ -788,7 +789,16 @@ class ContentSettings extends StatelessWidget {
                   ('AU', 'Australia'),
                   ('MX', 'Mexico'),
                 ], s.contentCountry);
-                if (v != null) s.contentCountry = v;
+                if (v != null) {
+                  s.contentCountry = v;
+                  final effectiveGl = (v == 'system' || v == 'GLOBAL')
+                      ? (v == 'GLOBAL' ? 'US' : (PlatformDispatcher.instance.locale.countryCode ?? 'US'))
+                      : v;
+                  final effectiveHl = s.contentLanguage == 'system'
+                      ? PlatformDispatcher.instance.locale.languageCode
+                      : s.contentLanguage;
+                  YouTube.instance.locale = YouTubeLocale(gl: effectiveGl, hl: effectiveHl);
+                }
               },
             ),
             Padding(

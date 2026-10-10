@@ -182,7 +182,15 @@ Future<void> showSongMenu(
     _MenuAction(
       liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
       liked ? 'Remove from liked' : 'Like',
-      () => player.toggleLike(meta),
+      () async {
+        final res = await player.toggleLike(meta);
+        if (context.mounted) {
+          showSnack(
+            context,
+            res ? 'Added to Liked Songs' : 'Removed from Liked Songs',
+          );
+        }
+      },
     ),
     _MenuAction(
       inLibrary ? Icons.bookmark_remove_rounded : Icons.bookmark_add_outlined,

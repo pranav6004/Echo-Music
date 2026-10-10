@@ -1,3 +1,4 @@
+import '../../data/settings.dart';
 import '../components/items.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,21 @@ import '../components/menus.dart';
 import '../components/thumbnail.dart';
 
 class ChartsScreen extends StatefulWidget {
+  static const countryOptions = <String, String>{
+    'GLOBAL': '🌐 Global / Worldwide',
+    'US': '🇺🇸 United States',
+    'GB': '🇬🇧 United Kingdom',
+    'IN': '🇮🇳 India',
+    'JP': '🇯🇵 Japan',
+    'KR': '🇰🇷 South Korea',
+    'DE': '🇩🇪 Germany',
+    'FR': '🇫🇷 France',
+    'BR': '🇧🇷 Brazil',
+    'CA': '🇨🇦 Canada',
+    'AU': '🇦🇺 Australia',
+    'MX': '🇲🇽 Mexico',
+  };
+
   const ChartsScreen({super.key});
 
   @override
@@ -18,13 +34,16 @@ class ChartsScreen extends StatefulWidget {
 }
 
 class _ChartsScreenState extends State<ChartsScreen> {
-  ChartsPage? _page;
+ChartsPage? _page;
   bool _loading = true;
   String? _error;
+  String _country = 'GLOBAL';
 
   @override
   void initState() {
     super.initState();
+    final pref = Settings.instance.contentCountry;
+    _country = (pref == 'system' || pref == 'US' || pref == 'GLOBAL') ? 'GLOBAL' : pref;
     _load();
   }
 
@@ -34,7 +53,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
       _error = null;
     });
     try {
-      final page = await YouTube.instance.charts();
+      final page = await YouTube.instance.charts(country: _country);
       if (mounted) {
         setState(() {
           _page = page;
@@ -76,11 +95,52 @@ class _ChartsScreenState extends State<ChartsScreen> {
       appBar: AppBar(
         title: const Text('Top Charts'),
         actions: [
+          PopupMenuButton<String>(
+            tooltip: 'Select country',
+            initialValue: _country,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: scheme.outlineVariant.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.public_rounded, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    ChartsScreen.countryOptions[_country] ?? _country,
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                  const Icon(Icons.arrow_drop_down_rounded, size: 20),
+                ],
+              ),
+            ),
+            onSelected: (code) {
+              if (code == _country) return;
+              setState(() => _country = code);
+              _load();
+            },
+            itemBuilder: (context) => [
+              for (final entry in ChartsScreen.countryOptions.entries)
+                PopupMenuItem(
+                  value: entry.key,
+                  child: Text(entry.value),
+                ),
+            ],
+          ),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh',
             onPressed: _load,
           ),
+          const SizedBox(width: 12),
         ],
       ),
       body: _loading
@@ -140,7 +200,9 @@ class _ChartsScreenState extends State<ChartsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Global Charts & Top Tracks',
+                      _country == 'GLOBAL'
+                          ? 'Global Charts & Top Tracks'
+                          : '${ChartsScreen.countryOptions[_country] ?? _country} Charts & Top Tracks',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),

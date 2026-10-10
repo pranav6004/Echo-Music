@@ -1361,12 +1361,17 @@ class YouTube {
     );
   }
 
-  Future<ChartsPage> charts({String? continuation}) async {
+  Future<ChartsPage> charts({String? country, String? continuation}) async {
+    final effectiveGl = (country == null || country == 'GLOBAL' || country == 'system')
+        ? (country == 'GLOBAL' ? 'US' : locale.gl)
+        : country;
+    final customLocale = YouTubeLocale(gl: effectiveGl, hl: locale.hl);
     final res = await innerTube.browse(
       _webRemix,
       browseId: 'FEmusic_charts',
       params: 'ggMGCgQIgAQ%3D',
       continuation: continuation,
+      customLocale: customLocale,
     );
     final sections = <ChartSection>[];
     for (final c in jml(res, [

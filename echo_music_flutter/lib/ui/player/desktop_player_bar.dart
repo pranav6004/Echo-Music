@@ -1,3 +1,4 @@
+import 'dart:async';
 import '../../stream/stream_resolver.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -523,17 +524,25 @@ class _LikeButton extends StatefulWidget {
 
 class _LikeButtonState extends State<_LikeButton> {
   bool _liked = false;
+  StreamSubscription? _dbSub;
 
   @override
   void initState() {
     super.initState();
     _check();
+    _dbSub = AppDatabase.instance.stream.listen((_) => _check());
   }
 
   @override
   void didUpdateWidget(covariant _LikeButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.meta.id != widget.meta.id) _check();
+  }
+
+  @override
+  void dispose() {
+    _dbSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _check() async {
@@ -553,7 +562,13 @@ class _LikeButtonState extends State<_LikeButton> {
       tooltip: _liked ? 'In Favorites' : 'Add to Favorites',
       onPressed: () async {
         final res = await player.toggleLike(widget.meta);
-        if (mounted) setState(() => _liked = res);
+        if (mounted) {
+          setState(() => _liked = res);
+          showSnack(
+            context,
+            res ? 'Added to Liked Songs' : 'Removed from Liked Songs',
+          );
+        }
       },
     );
   }

@@ -115,12 +115,13 @@ class InnerTubeClient {
     YouTubeClient client, {
     bool setLogin = false,
     Map<String, dynamic>? query,
+    YouTubeLocale? customLocale,
   }) => _withRetry(() async {
     final res = await _dio.post<dynamic>(
       path,
       data: jsonEncode(body),
       queryParameters: {'prettyPrint': 'false', ...?query},
-      options: Options(headers: _ytHeaders(client, setLogin: setLogin)),
+      options: Options(headers: _ytHeaders(client, setLogin: setLogin, customLocale: customLocale)),
     );
     final data = res.data;
     if (data is Map<String, dynamic>) return data;
@@ -129,8 +130,8 @@ class InnerTubeClient {
     return <String, dynamic>{};
   });
 
-  Map<String, dynamic> _ctx(YouTubeClient client, {bool login = false}) =>
-      client.toContext(locale, visitorData, login ? dataSyncId : null);
+  Map<String, dynamic> _ctx(YouTubeClient client, {bool login = false, YouTubeLocale? customLocale}) =>
+      client.toContext(customLocale ?? locale, visitorData, login ? dataSyncId : null);
 
   Future<Map<String, dynamic>> search(
     YouTubeClient client, {
@@ -194,18 +195,20 @@ class InnerTubeClient {
     String? params,
     String? continuation,
     bool setLogin = false,
+    YouTubeLocale? customLocale,
   }) {
     final effectiveLogin = (setLogin || useLoginForBrowse) && isLoggedIn;
     return _post(
       'browse',
       {
-        'context': _ctx(client, login: effectiveLogin),
+        'context': _ctx(client, login: effectiveLogin, customLocale: customLocale),
         'browseId': ?browseId,
         'params': ?params,
         'continuation': ?continuation,
       },
       client,
       setLogin: effectiveLogin,
+      customLocale: customLocale,
     );
   }
 
