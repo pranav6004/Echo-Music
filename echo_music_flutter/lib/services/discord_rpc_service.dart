@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import '../data/settings.dart';
 import '../playback/media_metadata.dart';
+import 'log_service.dart';
 
 /// Discord Rich Presence client communicating via local IPC.
 /// On Windows: uses native Named Pipes (\\.\pipe\discord-ipc-0).
@@ -21,6 +22,10 @@ class DiscordRpcService {
   int _windowsHandle = -1;
   Socket? _unixSocket;
   Timer? _reconnectTimer;
+
+  MediaMetadata? _lastMeta;
+  Duration _lastPosition = Duration.zero;
+  bool _lastIsPlaying = false;
 
   bool get isConnected => _connected;
 
@@ -47,14 +52,15 @@ class DiscordRpcService {
       } else if (Platform.isLinux || Platform.isMacOS) {
         await _connectUnix();
       }
-    } catch (_) {
+    } catch (e) {
+      LogService.instance.log('discord', 'Connection error: $e');
       _scheduleReconnect();
     }
   }
 
-  void _scheduleReconnect() {
+  void _scheduleReconnect([Duration delay = const Duration(seconds: 5)]) {
     _reconnectTimer?.cancel();
-    _reconnectTimer = Timer(const Duration(seconds: 30), () {
+    _reconnectTimer = Timer(delay, () {
       if (Settings.instance.enableDiscordRpc && !_connected) {
         connect();
       }
@@ -71,10 +77,16 @@ class DiscordRpcService {
       if (h != -1) {
         _windowsHandle = h;
         _connected = true;
+        _reconnectTimer?.cancel();
+        LogService.instance.log('discord', 'Connected via $pipeName');
         _sendHandshake();
+        _pushCurrentPresence();
         return;
       }
     }
+
+    _connected = false;
+    _scheduleReconnect(const Duration(seconds: 5));
   }
 
   Future<void> _connectUnix() async {
@@ -97,16 +109,35 @@ class DiscordRpcService {
           );
           _unixSocket = s;
           _connected = true;
+          _reconnectTimer?.cancel();
+          LogService.instance.log('discord', 'Connected via $p');
           _sendHandshake();
+          _pushCurrentPresence();
           return;
         } catch (_) {}
       }
     }
+
+    _connected = false;
+    _scheduleReconnect(const Duration(seconds: 5));
   }
 
   void _sendHandshake() {
     final payload = jsonEncode({'v': 1, 'client_id': _clientId});
     _sendPacket(0, payload); // Opcode 0 = HANDSHAKE
+  }
+
+  void _pushCurrentPresence() {
+    if (!_connected || _lastMeta == null || !_lastIsPlaying) return;
+    updatePresence(
+      title: _lastMeta!.title,
+      artist: _lastMeta!.artistsText,
+      album: _lastMeta!.album?.name,
+      artworkUrl: _lastMeta!.thumbnailUrl,
+      durationSec: _lastMeta!.duration,
+      elapsedSec: _lastPosition.inSeconds,
+      isPlaying: _lastIsPlaying,
+    );
   }
 
   void updatePresence({
@@ -143,7 +174,6 @@ class DiscordRpcService {
             ? artworkUrl
             : 'icon',
         'large_text': (album != null && album.isNotEmpty) ? album : title,
-        'small_image': isPlaying ? 'play' : 'pause',
         'small_text': isPlaying ? 'Playing' : 'Paused',
       },
     };
@@ -158,6 +188,7 @@ class DiscordRpcService {
     });
 
     _sendPacket(1, payload); // Opcode 1 = FRAME
+    LogService.instance.log('discord', 'Presence sent: $title - $artist');
   }
 
   void updateFromMedia({
@@ -165,10 +196,15 @@ class DiscordRpcService {
     required Duration position,
     required bool isPlaying,
   }) {
+    _lastMeta = metadata;
+    _lastPosition = position;
+    _lastIsPlaying = isPlaying;
+
     if (!Settings.instance.enableDiscordRpc) return;
 
     if (!_connected) {
       connect();
+      return;
     }
 
     if (!isPlaying) {
@@ -225,6 +261,7 @@ class DiscordRpcService {
       if (Platform.isWindows && _windowsHandle != -1) {
         final success = _Win32.writePipe(_windowsHandle, packet);
         if (!success) {
+          LogService.instance.log('discord', 'writePipe failed, reconnecting...');
           _connected = false;
           _windowsHandle = -1;
           _scheduleReconnect();
@@ -232,7 +269,8 @@ class DiscordRpcService {
       } else if (_unixSocket != null) {
         _unixSocket!.add(packet);
       }
-    } catch (_) {
+    } catch (e) {
+      LogService.instance.log('discord', 'Packet error: $e');
       _connected = false;
       _scheduleReconnect();
     }
@@ -298,34 +336,39 @@ class _Win32 {
     ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>, int, int, int)
   >('VirtualAlloc');
 
-  static final _virtualFree = k32?.lookupFunction<
-    ffi.Int32 Function(ffi.Pointer<ffi.Void>, ffi.Size, ffi.Uint32),
-    int Function(ffi.Pointer<ffi.Void>, int, int)
-  >('VirtualFree');
+  static ffi.Pointer<ffi.Uint16>? _nameBuf;
+  static ffi.Pointer<ffi.Uint8>? _ioBuf;
+  static ffi.Pointer<ffi.Uint32>? _writtenBuf;
+
+  static void _ensureBuffers() {
+    if (_ioBuf != null) return;
+    final va = _virtualAlloc;
+    if (va == null) return;
+
+    _nameBuf = va(ffi.Pointer.fromAddress(0), 1024, 0x1000 | 0x2000, 0x04).cast<ffi.Uint16>();
+    _ioBuf = va(ffi.Pointer.fromAddress(0), 65536, 0x1000 | 0x2000, 0x04).cast<ffi.Uint8>();
+    _writtenBuf = va(ffi.Pointer.fromAddress(0), 64, 0x1000 | 0x2000, 0x04).cast<ffi.Uint32>();
+  }
 
   static int openPipe(String name) {
     final cf = _createFile;
-    final va = _virtualAlloc;
-    final vf = _virtualFree;
-    if (cf == null || va == null || vf == null) return -1;
+    if (cf == null) return -1;
+    _ensureBuffers();
+    final namePtr = _nameBuf;
+    if (namePtr == null || namePtr.address == 0) return -1;
 
     final units = name.codeUnits;
-    final size = (units.length + 1) * 2;
-    final ptr = va(ffi.Pointer.fromAddress(0), size, 0x1000 | 0x2000, 0x04)
-        .cast<ffi.Uint16>();
-    if (ptr.address == 0) return -1;
-
     for (var i = 0; i < units.length; i++) {
-      ptr[i] = units[i];
+      namePtr[i] = units[i];
     }
-    ptr[units.length] = 0;
+    namePtr[units.length] = 0;
 
     const genericReadWrite = 0x80000000 | 0x40000000;
     const openExisting = 3;
     const fileAttributeNormal = 0x80;
 
-    final handle = cf(
-      ptr,
+    return cf(
+      namePtr,
       genericReadWrite,
       0,
       ffi.Pointer.fromAddress(0),
@@ -333,39 +376,32 @@ class _Win32 {
       fileAttributeNormal,
       0,
     );
-
-    vf(ptr.cast<ffi.Void>(), 0, 0x8000);
-    return handle;
   }
 
   static bool writePipe(int handle, Uint8List data) {
     final wf = _writeFile;
-    final va = _virtualAlloc;
-    final vf = _virtualFree;
-    if (wf == null || va == null || vf == null) return false;
-
-    final ptr = va(
-      ffi.Pointer.fromAddress(0),
-      data.length + 8,
-      0x1000 | 0x2000,
-      0x04,
-    ).cast<ffi.Uint8>();
-    if (ptr.address == 0) return false;
-
-    for (var i = 0; i < data.length; i++) {
-      ptr[i] = data[i];
+    if (wf == null || handle == -1) return false;
+    _ensureBuffers();
+    final ioBuf = _ioBuf;
+    final writtenBuf = _writtenBuf;
+    if (ioBuf == null || writtenBuf == null || ioBuf.address == 0 || writtenBuf.address == 0) {
+      return false;
     }
 
-    final bytesWrittenPtr = ptr.elementAt(data.length).cast<ffi.Uint32>();
+    if (data.length > 65536) return false;
+
+    for (var i = 0; i < data.length; i++) {
+      ioBuf[i] = data[i];
+    }
+
     final result = wf(
       handle,
-      ptr,
+      ioBuf,
       data.length,
-      bytesWrittenPtr,
+      writtenBuf,
       ffi.Pointer.fromAddress(0),
     );
 
-    vf(ptr.cast<ffi.Void>(), 0, 0x8000);
     return result != 0;
   }
 
