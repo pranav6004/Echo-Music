@@ -69,7 +69,7 @@ class InnerTubeClient {
       'X-Origin': YouTubeClient.originYouTubeMusic,
       'Referer': YouTubeClient.refererYouTubeMusic,
       'User-Agent': client.userAgent,
-      'Accept-Language': '${locale.hl},${locale.gl};q=0.9,en;q=0.8',
+      'Accept-Language': '${loc.hl},${loc.gl};q=0.9,en;q=0.8',
     };
     if (visitorData != null) headers['X-Goog-Visitor-Id'] = visitorData!;
     if (setLogin && client.loginSupported && _cookie != null) {
@@ -198,6 +198,7 @@ class InnerTubeClient {
     String? continuation,
     bool setLogin = false,
     YouTubeLocale? customLocale,
+    Map<String, dynamic>? formData,
   }) {
     final effectiveLogin = (setLogin || useLoginForBrowse) && isLoggedIn;
     return _post(
@@ -207,6 +208,7 @@ class InnerTubeClient {
         'browseId': ?browseId,
         'params': ?params,
         'continuation': ?continuation,
+        'formData': ?formData,
       },
       client,
       setLogin: effectiveLogin,

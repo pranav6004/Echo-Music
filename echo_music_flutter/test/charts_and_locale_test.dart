@@ -36,19 +36,23 @@ void main() {
       expect(opts.containsKey('DE'), isTrue);
     });
 
-    test('country code resolution resolves GLOBAL to US for worldwide charts', () {
-      String resolveGl(String? country, String fallbackGl) {
-        if (country == null || country == 'GLOBAL' || country == 'system') {
-          return country == 'GLOBAL' ? 'US' : fallbackGl;
-        }
-        return country;
+    test('country code resolution resolves GLOBAL to ZZ token and regional codes', () {
+      String resolveChartToken(String? country, String fallbackGl) {
+        final effectiveCountry = (country == null || country == 'system')
+            ? (fallbackGl == 'ZZ' || fallbackGl.isEmpty ? 'GLOBAL' : fallbackGl)
+            : country;
+        return (effectiveCountry == 'GLOBAL' || effectiveCountry == 'ZZ')
+            ? 'ZZ'
+            : effectiveCountry.toUpperCase();
       }
 
-      expect(resolveGl('GLOBAL', 'IN'), equals('US'));
-      expect(resolveGl('system', 'IN'), equals('IN'));
-      expect(resolveGl('GB', 'IN'), equals('GB'));
-      expect(resolveGl('JP', 'IN'), equals('JP'));
-      expect(resolveGl(null, 'IN'), equals('IN'));
+      expect(resolveChartToken('GLOBAL', 'IN'), equals('ZZ'));
+      expect(resolveChartToken('US', 'IN'), equals('US'));
+      expect(resolveChartToken('GB', 'IN'), equals('GB'));
+      expect(resolveChartToken('JP', 'IN'), equals('JP'));
+      expect(resolveChartToken('system', 'IN'), equals('IN'));
+      expect(resolveChartToken(null, 'IN'), equals('IN'));
+      expect(resolveChartToken('system', 'ZZ'), equals('ZZ'));
     });
   });
 }

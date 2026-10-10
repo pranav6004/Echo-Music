@@ -43,7 +43,7 @@ ChartsPage? _page;
   void initState() {
     super.initState();
     final pref = Settings.instance.contentCountry;
-    _country = (pref == 'system' || pref == 'US' || pref == 'GLOBAL') ? 'GLOBAL' : pref;
+    _country = (pref.isEmpty || pref == 'system') ? 'GLOBAL' : pref;
     _load();
   }
 
@@ -124,6 +124,7 @@ ChartsPage? _page;
             onSelected: (code) {
               if (code == _country) return;
               setState(() => _country = code);
+              Settings.instance.contentCountry = code;
               _load();
             },
             itemBuilder: (context) => [
