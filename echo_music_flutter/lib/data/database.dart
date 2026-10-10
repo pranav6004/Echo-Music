@@ -334,6 +334,7 @@ class AppDatabase {
   Database? _db;
   final _changes = StreamController<void>.broadcast();
   Stream<void> get changes => _changes.stream;
+  Stream<void> get stream => _changes.stream;
 
   Future<Database> get db async {
     if (_db != null) return _db!;

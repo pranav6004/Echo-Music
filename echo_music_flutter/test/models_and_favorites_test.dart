@@ -41,6 +41,11 @@ void main() {
       expect(PlaylistRow.downloadedId, equals('LP_DOWNLOADED'));
     });
 
+    test('AppDatabase exposes reactive changes and stream broadcast notifiers', () {
+      expect(AppDatabase.instance.changes, isNotNull);
+      expect(AppDatabase.instance.stream, isNotNull);
+    });
+
     test('MediaMetadata from SongItem preserves artists, album, and duration', () {
       final songItem = SongItem(
         id: 's_999',

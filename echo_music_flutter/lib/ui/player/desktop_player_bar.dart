@@ -530,7 +530,7 @@ class _LikeButtonState extends State<_LikeButton> {
   void initState() {
     super.initState();
     _check();
-    _dbSub = AppDatabase.instance.stream.listen((_) => _check());
+    _dbSub = AppDatabase.instance.changes.listen((_) => _check());
   }
 
   @override
